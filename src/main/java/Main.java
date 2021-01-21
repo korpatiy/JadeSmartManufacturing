@@ -18,21 +18,24 @@ public class Main {
 
     public static void startMyContainer() throws StaleProxyException {
         Profile anotherProfile = new ProfileImpl(false);
-        anotherProfile.setParameter(Profile.CONTAINER_NAME,"Manufacture-Container");
+        anotherProfile.setParameter(Profile.CONTAINER_NAME, "Manufacture-Container");
         AgentContainer anotherContainer = runtime.createAgentContainer(anotherProfile);
 
         String[] args = new String[]{"ClassicTable"};
-        AgentController AgentDb = anotherContainer.createNewAgent("DistributorAgent-1",
-                "Agents.Distributors.AgentDb", args);
-        AgentDb.start();
-        AgentController testAgent = anotherContainer.createNewAgent("DistributorAgent-2",
-                "Agents.Distributors.AgentDb1", null);
-        testAgent.start();
+        AgentController agentDb = anotherContainer.createNewAgent("DistributorAgent",
+                "Agents.AgentDistributor", args);
+        agentDb.start();
+
+        AgentController agentM = anotherContainer.createNewAgent("AgentManager","Agents.AgentManager", null);
+        AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1","Agents.AgentManager", null);
+        agentM.start();
+        agentM1.start();
     }
 
     public static void main(String[] args) throws StaleProxyException {
         runtime = Runtime.instance();
         startMainContainer();
         startMyContainer();
+
     }
 }
