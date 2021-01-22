@@ -27,9 +27,9 @@ public class Main {
         agentDb.start();
 
         AgentController agentM = anotherContainer.createNewAgent("AgentManager","Agents.AgentManager", null);
-        AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1","Agents.AgentManager", null);
+        //AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1","Agents.AgentManager", null);
         agentM.start();
-        agentM1.start();
+       // agentM1.start();
     }
 
     public static void main(String[] args) throws StaleProxyException {
