@@ -2,7 +2,6 @@ package Agents;
 
 import ManufactureOntology.ManufactureOntology;
 import ManufactureOntology.Predicates.HasMaterial;
-import jade.content.Concept;
 import jade.content.ContentElement;
 import jade.content.ContentManager;
 import jade.content.lang.Codec;
@@ -11,10 +10,10 @@ import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.SimpleBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.util.leap.ArrayList;
+import jade.util.leap.List;
 
 public class AgentManager extends Agent {
 
@@ -22,58 +21,65 @@ public class AgentManager extends Agent {
     private ContentManager contentManager = getContentManager();
     private Codec codec = new SLCodec();
     private Ontology ontology = ManufactureOntology.getInstance();
+    private List orders = new ArrayList();
 
     @Override
     protected void setup() {
+        System.out.println("Manager-Agent " + getAID().getName() + " is ready.");
         contentManager.registerLanguage(codec);
         contentManager.registerOntology(ontology);
         addBehaviour(new OfferRequests());
+        addBehaviour(new ApplyOffer());
     }
 
-    private class OfferRequests extends SimpleBehaviour {
-
-        //Признак завершения агент
-        public boolean finished = false;
-
-        @Override
-        public boolean done() {
-            return finished;
-        }
+    private class OfferRequests extends CyclicBehaviour {
 
         @Override
         public void action() {
-            System.out.println("get message");
-            //MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
-            try {
-                ACLMessage msg = blockingReceive();
-                if (msg != null)
-                    switch (msg.getPerformative()) {
-                        case ACLMessage.INFORM:
-                            ContentElement p = contentManager.extractContent(msg);
-                            if (p instanceof HasMaterial) {
-                                HasMaterial hasMaterial = (HasMaterial) p;
-                                System.out.println("[" + getLocalName() +
-                                        "] Receiver inform message: information stored.");
-                                break;
-                            }
-                    }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            finished = true;
-            /*String title;
-            ACLMessage reply = null;
+            //только CFP message
+            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
+            ACLMessage msg = myAgent.receive(mt);
             if (msg != null) {
-                title = msg.getContent();
-                reply = msg.createReply();
+                System.out.println("Manager-Agent: Принял CFP сообщение от дистрб");
+                ACLMessage reply = msg.createReply();
+                if (orders.size() > 3) {
+                    reply.setPerformative(ACLMessage.REFUSE);
+                    reply.setContent("Стек агента менеджера переполнен");
+                } else {
+                    reply.setPerformative(ACLMessage.PROPOSE);
+                    System.out.println("Manager-Agent: Propose");
+                }
+                send(reply);
             } else {
-                reply.setPerformative(ACLMessage.REFUSE);
-                reply.setContent("123");
+                block();
             }
-            send(reply);*/
         }
+    }
 
+    private class ApplyOffer extends CyclicBehaviour {
+
+        @Override
+        public void action() {
+            //Только ACCEPT message
+            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
+            ACLMessage msg = receive(mt);
+            if (msg != null) {
+                System.out.println("Manager-Agent: Принял ACCEPT сообщение от дистрб");
+                ContentElement p = null;
+                try {
+                    p = contentManager.extractContent(msg);
+                } catch (Codec.CodecException | OntologyException e) {
+                    e.printStackTrace();
+                }
+                if (p instanceof HasMaterial) {
+                    HasMaterial hasMaterial = (HasMaterial) p;
+                    System.out.println("[" + getLocalName() +
+                            "] Receiver inform message: information stored.");
+                }
+            } else {
+                block();
+            }
+        }
     }
 
     @Override

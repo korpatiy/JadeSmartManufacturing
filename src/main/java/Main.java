@@ -1,3 +1,4 @@
+import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
 import jade.core.Runtime;
@@ -23,19 +24,18 @@ public class Main {
 
         String[] args = new String[]{"ClassicTable"};
         AgentController agentDb = anotherContainer.createNewAgent("DistributorAgent",
-                "Agents.AgentDistributor", args);
+                "Agents.AgentDistributor", null);
         agentDb.start();
 
-        AgentController agentM = anotherContainer.createNewAgent("AgentManager","Agents.AgentManager", null);
+        AgentController agentM = anotherContainer.createNewAgent("AgentManager", "Agents.AgentManager", null);
         //AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1","Agents.AgentManager", null);
         agentM.start();
-       // agentM1.start();
+        // agentM1.start();
     }
 
     public static void main(String[] args) throws StaleProxyException {
         runtime = Runtime.instance();
         startMainContainer();
         startMyContainer();
-
     }
 }
