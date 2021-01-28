@@ -10,6 +10,10 @@ import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
+import jade.domain.DFService;
+import jade.domain.FIPAAgentManagement.DFAgentDescription;
+import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.util.leap.ArrayList;
@@ -25,6 +29,28 @@ public class AgentManager extends Agent {
 
     @Override
     protected void setup() {
+
+        Object[] args = getArguments();
+
+        if (args != null && args.length > 0) {
+            product = (String) args[0];
+        } else {
+            System.out.println("No product title specified");
+            doDelete();
+        }
+
+      /*  DFAgentDescription dfd = new DFAgentDescription();
+        dfd.setName(getAID());
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("manager-distributor");
+        sd.setName("manager-agent");
+        dfd.addServices(sd);
+        try {
+            DFService.register(this,dfd);
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }*/
+
         System.out.println("Manager-Agent " + getAID().getName() + " is ready.");
         contentManager.registerLanguage(codec);
         contentManager.registerOntology(ontology);
@@ -40,14 +66,18 @@ public class AgentManager extends Agent {
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
             ACLMessage msg = myAgent.receive(mt);
             if (msg != null) {
-                System.out.println("Manager-Agent: Принял CFP сообщение от дистрб");
+                System.out.println("[" + getLocalName() +
+                        "] Принял CFP сообщение от дистрибютора");
                 ACLMessage reply = msg.createReply();
-                if (orders.size() > 3) {
+                if (!product.equals(msg.getContent())) {
                     reply.setPerformative(ACLMessage.REFUSE);
-                    reply.setContent("Стек агента менеджера переполнен");
+                    System.out.println("[" + getLocalName() +
+                            "] Не готов принять заказ");
+                    reply.setContent("Не найден продукт");
                 } else {
                     reply.setPerformative(ACLMessage.PROPOSE);
-                    System.out.println("Manager-Agent: Propose");
+                    System.out.println("[" + getLocalName() +
+                            "] Готов Принять заказ");
                 }
                 send(reply);
             } else {
@@ -62,9 +92,10 @@ public class AgentManager extends Agent {
         public void action() {
             //Только ACCEPT message
             MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.ACCEPT_PROPOSAL);
-            ACLMessage msg = receive(mt);
+            ACLMessage msg = myAgent.receive(mt);
             if (msg != null) {
-                System.out.println("Manager-Agent: Принял ACCEPT сообщение от дистрб");
+                System.out.println("[" + getLocalName() +
+                        "] Принял ACCEPT сообщение от дистрб");
                 ContentElement p = null;
                 try {
                     p = contentManager.extractContent(msg);
@@ -73,9 +104,13 @@ public class AgentManager extends Agent {
                 }
                 if (p instanceof HasMaterial) {
                     HasMaterial hasMaterial = (HasMaterial) p;
-                    System.out.println("[" + getLocalName() +
-                            "] Receiver inform message: information stored.");
                 }
+                ACLMessage reply = msg.createReply();
+                reply.setPerformative(ACLMessage.INFORM);
+
+                System.out.println("[" + getLocalName() +
+                                "]  Присутпил к выполнению");
+                send(reply);
             } else {
                 block();
             }

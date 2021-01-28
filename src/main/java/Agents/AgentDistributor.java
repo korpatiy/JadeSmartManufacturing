@@ -12,11 +12,13 @@ import jade.content.onto.OntologyException;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.AMSService;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.tools.introspector.gui.MyDialog;
 import jade.util.leap.ArrayList;
 import jade.util.leap.List;
 
@@ -47,9 +49,21 @@ public class AgentDistributor extends Agent {
             doDelete();
         }*/
 
+       /* DFAgentDescription template = new DFAgentDescription();
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("manager-distributor");*/
+
+
         findManagers();
         contentManager.registerLanguage(codec);
         contentManager.registerOntology(ontology);
+        /*addBehaviour(new TickerBehaviour(this,30000) {
+            @Override
+            protected void onTick() {
+                myAgent.addBehaviour(new sendStartMessage());
+            }
+        });*/
+      //  addBehaviour(new sendStartMessage());
         addBehaviour(new sendStartMessage());
     }
 
@@ -64,32 +78,26 @@ public class AgentDistributor extends Agent {
                 case 0:
                     ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
                     managerAgents.forEach(agent -> cfp.addReceiver(agent.getName()));
-                    cfp.setConversationId(CONVERSATION_ID);
+                    cfp.setConversationId("distributor-manager");
                     cfp.setReplyWith("msg" + System.currentTimeMillis());
-
-                    send(cfp);
+                    cfp.setContent("ClassicTable");
+                    myAgent.send(cfp);
                     //System.out.println("Message send to Manager");
-                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId(CONVERSATION_ID),
+                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId("distributor-manager"),
                             MessageTemplate.MatchInReplyTo(cfp.getReplyWith()));
                     step = 1;
-                    System.out.println("Distributor-Agent: Отправка предложения менеджеру");
+                    System.out.println("[" + getLocalName() +
+                            "] Отправка предложения менеджерам");
                     break;
                 //получение ответа
                 case 1:
-                    ACLMessage reply = receive(mt);
+                    ACLMessage reply = myAgent.receive(mt);
                     if (reply != null) {
-                        switch (reply.getPerformative()) {
-                            case ACLMessage.PROPOSE:
-                                manager = reply.getSender();
-                                break;
-                            case ACLMessage.REFUSE:
-                                System.out.println(reply.getContent());
-                                doDelete();
-                                break;
-                            default:
-                                doDelete();
-                                break;
-                        }
+                        if(reply.getPerformative() == ACLMessage.PROPOSE)
+                            manager = reply.getSender();
+                        else
+                            System.out.println("[" + getLocalName() +
+                                            "] отказ от менеджера " + reply.getSender().getLocalName());
                         replyCnt++;
                         if (replyCnt >= managerAgents.size())
                             step = 2;
@@ -133,13 +141,15 @@ public class AgentDistributor extends Agent {
                     mt = MessageTemplate.and(MessageTemplate.MatchConversationId(CONVERSATION_ID),
                             MessageTemplate.MatchInReplyTo(order.getReplyWith()));
                     step = 3;
-                    System.out.println("Distributor-Agent: Заказ отправлен");
+                    System.out.println("[" + getLocalName() +
+                            "]: Заказ отправлен менеджеру");
                     break;
                 case 3:
                     reply = receive(mt);
                     if (reply != null) {
                         if (reply.getPerformative() == ACLMessage.INFORM) {
-                            System.out.println("Заказ передан менеджеру");
+                            System.out.println("[" + getLocalName() +
+                                            "] Заказ принят менеджером " + reply.getSender().getLocalName());
                             doDelete();
                         }
                         step = 4;

@@ -27,15 +27,18 @@ public class Main {
                 "Agents.AgentDistributor", null);
         agentDb.start();
 
-        AgentController agentM = anotherContainer.createNewAgent("AgentManager", "Agents.AgentManager", null);
-        //AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1","Agents.AgentManager", null);
+        String[] args1 = new String[]{"ClassicTable"};
+        String[] args2 = new String[]{"ClassicChair"};
+        AgentController agentM = anotherContainer.createNewAgent("AgentManager", "Agents.AgentManager", args1);
+        AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1","Agents.AgentManager", args2);
         agentM.start();
-        // agentM1.start();
+        agentM1.start();
     }
 
-    public static void main(String[] args) throws StaleProxyException {
+    public static void main(String[] args) throws StaleProxyException, InterruptedException {
         runtime = Runtime.instance();
         startMainContainer();
+        //Thread.sleep(10000);
         startMyContainer();
     }
 }
