@@ -8,7 +8,9 @@ import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
+import jade.core.AID;
 import jade.core.Agent;
+import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -26,6 +28,7 @@ public class AgentManager extends Agent {
     private Codec codec = new SLCodec();
     private Ontology ontology = ManufactureOntology.getInstance();
     private List orders = new ArrayList();
+    private AID[] manufAgents;
 
     @Override
     protected void setup() {
@@ -39,23 +42,31 @@ public class AgentManager extends Agent {
             doDelete();
         }
 
-      /*  DFAgentDescription dfd = new DFAgentDescription();
-        dfd.setName(getAID());
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType("manager-distributor");
-        sd.setName("manager-agent");
-        dfd.addServices(sd);
-        try {
-            DFService.register(this,dfd);
-        } catch (FIPAException e) {
-            e.printStackTrace();
-        }*/
-
         System.out.println("Manager-Agent " + getAID().getName() + " is ready.");
-        contentManager.registerLanguage(codec);
-        contentManager.registerOntology(ontology);
+        this.contentManager.registerLanguage(codec);
+        this.contentManager.registerOntology(ontology);
         addBehaviour(new OfferRequests());
         addBehaviour(new ApplyOffer());
+    }
+
+    private void findServices(Agent myAgent) {
+        DFAgentDescription template = new DFAgentDescription();
+        ServiceDescription sd = new ServiceDescription();
+        sd.setType("manager-manufacturer");
+        //ServiceDescription sd1 = new ServiceDescription();
+        //sd1.setType("manager-collector");
+
+        template.addServices(sd);
+        try {
+            DFAgentDescription[] result = DFService.search(myAgent, template);
+            manufAgents = new AID[result.length];
+            for (int i = 0; i < result.length; i++) {
+                manufAgents[i] = result[i].getName();
+            }
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private class OfferRequests extends CyclicBehaviour {
@@ -102,18 +113,43 @@ public class AgentManager extends Agent {
                 } catch (Codec.CodecException | OntologyException e) {
                     e.printStackTrace();
                 }
+                HasMaterial hasMaterial = null;
                 if (p instanceof HasMaterial) {
-                    HasMaterial hasMaterial = (HasMaterial) p;
+                    hasMaterial = (HasMaterial) p;
                 }
                 ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);
 
-                System.out.println("[" + getLocalName() +
-                                "]  Присутпил к выполнению");
                 send(reply);
+                findServices(myAgent);
+                //addBehaviour(new ManageProduct());
             } else {
                 block();
             }
+        }
+    }
+
+    private class ManageProduct extends Behaviour {
+
+        private int step = 0;
+
+        @Override
+        public void action() {
+            findServices(myAgent);
+            System.out.println("[" + getLocalName() + "] Приступил к выполнению");
+            switch (step) {
+                case 0:
+
+
+                    step = 1;
+                    break;
+
+            }
+        }
+
+        @Override
+        public boolean done() {
+            return step == 2;
         }
     }
 

@@ -1,3 +1,4 @@
+import Agents.AgentManufacturer;
 import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -30,9 +31,14 @@ public class Main {
         String[] args1 = new String[]{"ClassicTable"};
         String[] args2 = new String[]{"ClassicChair"};
         AgentController agentM = anotherContainer.createNewAgent("AgentManager", "Agents.AgentManager", args1);
-        AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1","Agents.AgentManager", args2);
+        // AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1","Agents.AgentManager", args2);
         agentM.start();
-        agentM1.start();
+        // agentM1.start();
+
+        AgentController agentManuf = anotherContainer.createNewAgent("AgetnManuf", "Agents.AgentManufacturer", null);
+        agentManuf.start();
+        AgentController agentCol = anotherContainer.createNewAgent("AgentCol", "Agents.AgentCollector", null);
+        agentCol.start();
     }
 
     public static void main(String[] args) throws StaleProxyException, InterruptedException {

@@ -25,14 +25,22 @@ public class AgentCollector extends Agent {
         sd.setType("manager-collector");
         sd.setName("Product-collector");
         dfd.addServices(sd);
-        //dfd.addLanguages();
-        //dfd.addOntologies();
-        contentManager.registerLanguage(codec);
-        contentManager.registerOntology(ontology);
         try {
             DFService.register(this,dfd);
         } catch (FIPAException e) {
             e.printStackTrace();
         }
+        contentManager.registerLanguage(codec);
+        contentManager.registerOntology(ontology);
+    }
+
+    @Override
+    protected void takeDown() {
+        try {
+            DFService.deregister(this);
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+        System.out.println(getAID().getName() + " terminating.");
     }
 }

@@ -1,5 +1,6 @@
 package Agents;
 
+import API.Constants;
 import ManufactureOntology.Concepts.Material;
 import ManufactureOntology.Concepts.Product;
 import ManufactureOntology.ManufactureOntology;
@@ -12,13 +13,11 @@ import jade.content.onto.OntologyException;
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.TickerBehaviour;
 import jade.domain.AMSService;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.tools.introspector.gui.MyDialog;
 import jade.util.leap.ArrayList;
 import jade.util.leap.List;
 
@@ -33,7 +32,6 @@ public class AgentDistributor extends Agent {
     private Ontology ontology = ManufactureOntology.getInstance();
     private java.util.List<AMSAgentDescription> managerAgents = null;
     private MessageTemplate mt;
-    private final String CONVERSATION_ID = "distributor-manager";
     private AID manager;
     private int replyCnt = 0;
 
@@ -49,21 +47,9 @@ public class AgentDistributor extends Agent {
             doDelete();
         }*/
 
-       /* DFAgentDescription template = new DFAgentDescription();
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType("manager-distributor");*/
-
-
         findManagers();
-        contentManager.registerLanguage(codec);
-        contentManager.registerOntology(ontology);
-        /*addBehaviour(new TickerBehaviour(this,30000) {
-            @Override
-            protected void onTick() {
-                myAgent.addBehaviour(new sendStartMessage());
-            }
-        });*/
-      //  addBehaviour(new sendStartMessage());
+        this.contentManager.registerLanguage(codec);
+        this.contentManager.registerOntology(ontology);
         addBehaviour(new sendStartMessage());
     }
 
@@ -93,11 +79,11 @@ public class AgentDistributor extends Agent {
                 case 1:
                     ACLMessage reply = myAgent.receive(mt);
                     if (reply != null) {
-                        if(reply.getPerformative() == ACLMessage.PROPOSE)
+                        if (reply.getPerformative() == ACLMessage.PROPOSE)
                             manager = reply.getSender();
                         else
                             System.out.println("[" + getLocalName() +
-                                            "] отказ от менеджера " + reply.getSender().getLocalName());
+                                    "] отказ от менеджера " + reply.getSender().getLocalName());
                         replyCnt++;
                         if (replyCnt >= managerAgents.size())
                             step = 2;
@@ -112,7 +98,7 @@ public class AgentDistributor extends Agent {
                     order.addReceiver(manager);
                     order.setLanguage(codec.getName());
                     order.setOntology(ontology.getName());
-                    order.setConversationId(CONVERSATION_ID);
+                    order.setConversationId(Constants.CONVERSATION_ID);
                     order.setReplyWith("order" + System.currentTimeMillis());
 
                     Product table = new Product();
@@ -138,7 +124,7 @@ public class AgentDistributor extends Agent {
                         e.printStackTrace();
                     }
                     send(order);
-                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId(CONVERSATION_ID),
+                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId(Constants.CONVERSATION_ID),
                             MessageTemplate.MatchInReplyTo(order.getReplyWith()));
                     step = 3;
                     System.out.println("[" + getLocalName() +
@@ -149,7 +135,7 @@ public class AgentDistributor extends Agent {
                     if (reply != null) {
                         if (reply.getPerformative() == ACLMessage.INFORM) {
                             System.out.println("[" + getLocalName() +
-                                            "] Заказ принят менеджером " + reply.getSender().getLocalName());
+                                    "] Заказ принят менеджером " + reply.getSender().getLocalName());
                             doDelete();
                         }
                         step = 4;
@@ -164,8 +150,6 @@ public class AgentDistributor extends Agent {
         public boolean done() {
             return step == 4;
         }
-
-
     }
 
     private void findManagers() {
