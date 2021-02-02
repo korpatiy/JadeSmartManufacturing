@@ -40,12 +40,12 @@ public class AgentDistributor extends Agent {
         System.out.println("Distributor-Agent " + getAID().getName() + " is ready.");
         Object[] args = getArguments();
 
-       /* if (args != null && args.length > 0) {
+        if (args != null && args.length > 0) {
             product = (String) args[0];
         } else {
             System.out.println("No product title specified");
             doDelete();
-        }*/
+        }
 
         findManagers();
         this.contentManager.registerLanguage(codec);
@@ -66,7 +66,7 @@ public class AgentDistributor extends Agent {
                     managerAgents.forEach(agent -> cfp.addReceiver(agent.getName()));
                     cfp.setConversationId("distributor-manager");
                     cfp.setReplyWith("msg" + System.currentTimeMillis());
-                    cfp.setContent("ClassicTable");
+                    cfp.setContent(product);
                     myAgent.send(cfp);
                     //System.out.println("Message send to Manager");
                     mt = MessageTemplate.and(MessageTemplate.MatchConversationId("distributor-manager"),
@@ -145,6 +145,7 @@ public class AgentDistributor extends Agent {
                     break;
             }
         }
+
 
         @Override
         public boolean done() {

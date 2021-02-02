@@ -10,8 +10,7 @@ import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.*;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -28,7 +27,7 @@ public class AgentManager extends Agent {
     private Codec codec = new SLCodec();
     private Ontology ontology = ManufactureOntology.getInstance();
     private List orders = new ArrayList();
-    private AID[] manufAgents;
+    private AID[] manufacturerAgents;
 
     @Override
     protected void setup() {
@@ -45,8 +44,10 @@ public class AgentManager extends Agent {
         System.out.println("Manager-Agent " + getAID().getName() + " is ready.");
         this.contentManager.registerLanguage(codec);
         this.contentManager.registerOntology(ontology);
+
         addBehaviour(new OfferRequests());
         addBehaviour(new ApplyOffer());
+        //working();
     }
 
     private void findServices(Agent myAgent) {
@@ -59,9 +60,9 @@ public class AgentManager extends Agent {
         template.addServices(sd);
         try {
             DFAgentDescription[] result = DFService.search(myAgent, template);
-            manufAgents = new AID[result.length];
+            manufacturerAgents = new AID[result.length];
             for (int i = 0; i < result.length; i++) {
-                manufAgents[i] = result[i].getName();
+                manufacturerAgents[i] = result[i].getName();
             }
         } catch (FIPAException e) {
             e.printStackTrace();
@@ -122,14 +123,118 @@ public class AgentManager extends Agent {
 
                 send(reply);
                 findServices(myAgent);
-                //addBehaviour(new ManageProduct());
+                //working();
+                //working(myAgent);
+                //addBehaviour(new test());
             } else {
                 block();
             }
+            // working();
         }
     }
 
-    private class ManageProduct extends Behaviour {
+    private void startManage() {
+        FSMBehaviour fsmBehaviour = new FSMBehaviour(this) {
+            @Override
+            public int onEnd() {
+                System.out.println("[" + getLocalName() +
+                        "]: завершил работу над продуктом...");
+                //переработать завершение -> согласовать с выше стоящими поведениями
+                return 0;
+            }
+        };
+
+        fsmBehaviour.registerFirstState(new OneShotBehaviour() {
+            @Override
+            public void action() {
+                System.out.println("[" + getLocalName() +
+                        "]: Приступил к работе над продуктом...");
+            }
+        }, "A");
+
+        //распределение
+        fsmBehaviour.registerState(new Behaviour() {
+
+            int step = 0;
+            int dcount = 4;
+
+            @Override
+            public void action() {
+                switch (step) {
+                    case 0:
+                        ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+                        for (int i = 0; i < manufacturerAgents.length; i++) {
+                            cfp.addReceiver(manufacturerAgents[i]);
+                        }
+                        cfp.setConversationId("manager-manufacturer");
+                        cfp.setReplyWith("msg" + System.currentTimeMillis());
+                        send(cfp);
+                        step = 1;
+                        break;
+                    case 1:
+
+                        break;
+                }
+            }
+
+            @Override
+            public boolean done() {
+                return step == 4;
+            }
+        }, "B");
+
+
+
+    }
+
+    private void working() {
+
+        FSMBehaviour compFSM = new FSMBehaviour(this) {
+            @Override
+            public int onEnd() {
+                System.out.println("FSM Behavior completed successfully!");
+                return 0;
+            }
+        };
+
+        compFSM.registerFirstState(new OneShotBehaviour(this) {
+            int c = 0;
+
+            @Override
+            public void action() {
+                System.out.println("complement all the X Behavior");
+                c++;
+            }
+
+            @Override
+            public int onEnd() {
+                return (c > 4 ? 1 : 0);
+            }
+        }, "X");
+
+        compFSM.registerState(new OneShotBehaviour(this) {
+
+            public void action() {
+                System.out.println("complement all of Z Behavior");
+            }
+
+            public int onEnd() {
+                return 2;
+            }
+        }, "Z");
+        compFSM.registerLastState(new OneShotBehaviour(this) {
+
+            public void action() {
+                System.out.println("Running my last behavior.");
+            }
+        }, "Y");
+        compFSM.registerTransition("X", "Z", 0);
+        compFSM.registerTransition("X", "Y", 1);
+        compFSM.registerDefaultTransition("Z", "X", new String[]{"X", "Z"});
+        addBehaviour(compFSM);
+    }
+
+    /*private class ManageProduct extends SequentialBehaviour {
 
         private int step = 0;
 
@@ -151,7 +256,7 @@ public class AgentManager extends Agent {
         public boolean done() {
             return step == 2;
         }
-    }
+    }*/
 
     @Override
     protected void takeDown() {
