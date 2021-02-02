@@ -1,5 +1,6 @@
 package Agents;
 
+import API.Constants;
 import ManufactureOntology.ManufactureOntology;
 import jade.content.ContentManager;
 import jade.content.lang.Codec;
@@ -22,8 +23,8 @@ public class AgentCollector extends Agent {
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
-        sd.setType("manager-collector");
-        sd.setName("Product-collector");
+        sd.setType(Constants.COLLECTOR_TYPE);
+        sd.setName(getLocalName());
         dfd.addServices(sd);
         try {
             DFService.register(this,dfd);

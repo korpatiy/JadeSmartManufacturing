@@ -1,15 +1,13 @@
 package Agents;
 
+import API.Constants;
 import ManufactureOntology.ManufactureOntology;
 import jade.content.ContentManager;
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
-import jade.core.behaviours.FSMBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.SimpleBehaviour;
+import jade.core.behaviours.*;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -29,8 +27,8 @@ public class AgentManufacturer extends Agent {
         DFAgentDescription dfd = new DFAgentDescription();
         dfd.setName(getAID());
         ServiceDescription sd = new ServiceDescription();
-        sd.setType("manager-manufacturer");
-        sd.setName("Product-manufacturer");
+        sd.setType(Constants.MANUFACTURER_TYPE);
+        sd.setName(getLocalName());
         //sd.addOntologies(ManufactureOntology.getInstance().getName());
         dfd.addServices(sd);
         //dfd.addOntologies(ManufactureOntology.getInstance().getName());
@@ -41,6 +39,7 @@ public class AgentManufacturer extends Agent {
         } catch (FIPAException e) {
             e.printStackTrace();
         }
+        startWorking();
     }
 
     private void startWorking() {
@@ -56,58 +55,70 @@ public class AgentManufacturer extends Agent {
             }
         };
 
-        fsmBehaviour.registerFirstState(new OneShotBehaviour() {
+        fsmBehaviour.registerFirstState(new WakerBehaviour(this, 1000) {
             @Override
-            public void action() {
-                System.out.println("[" + getLocalName() +
-                        "]: Получил ресурсы...");
+            protected void handleElapsedTimeout() {
+                System.out.println("lel");
             }
-        }, "A");
 
-        /*fsmBehaviour.registerFirstState(new OneShotBehaviour() {
             @Override
-            public void action() {
-                System.out.println("[" + getLocalName() +
-                        "]: Начал изготовку...");
+            public int onEnd() {
+                return 5;
             }
-        }, "B");
+        }, "L");
 
-        fsmBehaviour.registerFirstState(new OneShotBehaviour() {
-            @Override
-            public void action() {
-                System.out.println("[" + getLocalName() +
-                        "]: Сделал обработку...");
-            }
-        }, "С");*/
+        fsmBehaviour.registerState(new SimpleBehaviour(this) {
 
-        fsmBehaviour.registerState(new SimpleBehaviour() {
+            int step = 0;
+
             @Override
             public void action() {
                 System.out.println("[" + getLocalName() +
                         "]: Отправляю на проверку...");
                 ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
+                step++;
             }
+
+
 
             @Override
             public boolean done() {
-                return false;
+                return true;
+            }
+
+            @Override
+            public int onEnd() {
+                return (step > 4 ? 1 : 0);
+            }
+        }, "A");
+
+        fsmBehaviour.registerState(new OneShotBehaviour(this) {
+
+            @Override
+            public void action() {
+                System.out.println("[" + getLocalName() +
+                        "]: Не удалось сделать...");
+            }
+
+            @Override
+            public int onEnd() {
+                return 2;
+            }
+        }, "C");
+
+        fsmBehaviour.registerLastState(new OneShotBehaviour(this) {
+            @Override
+            public void action() {
+                System.out.println("[" + getLocalName() +
+                        "]: Оповещаю менеджера...");
             }
         }, "B");
-    }
 
-    private class Working extends CyclicBehaviour {
-
-        @Override
-        public void action() {
-            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
-            ACLMessage msg = myAgent.receive(mt);
-            if (msg != null) {
-                ACLMessage reply = msg.createReply();
-                ACLMessage t = new ACLMessage(ACLMessage.SUBSCRIBE);
-            } else {
-                block();
-            }
-        }
+        fsmBehaviour.registerTransition("L", "A", 5);
+        fsmBehaviour.registerTransition("A", "C", 0);
+        fsmBehaviour.registerTransition("A", "B", 1);
+        fsmBehaviour.registerDefaultTransition("C", "L", new String[]{"L", "C"});
+        addBehaviour(fsmBehaviour);
     }
 
     @Override

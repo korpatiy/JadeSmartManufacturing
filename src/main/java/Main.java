@@ -24,28 +24,25 @@ public class Main {
         AgentContainer anotherContainer = runtime.createAgentContainer(anotherProfile);
 
         String[] args = new String[]{"ClassicTable"};
-        String[] args1 = new String[]{"ClassicTable"};
         String[] args2 = new String[]{"ClassicChair"};
-
-        AgentController agentM = anotherContainer.createNewAgent("AgentManager", "Agents.AgentManager", args1);
-        AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1","Agents.AgentManager", args2);
-        agentM.start();
-        agentM1.start();
-
 
         AgentController agentDb = anotherContainer.createNewAgent("DistributorAgent",
                 "Agents.AgentDistributor", args);
         agentDb.start();
+
+        AgentController agentM = anotherContainer.createNewAgent("AgentManager", "Agents.AgentManager", args);
+        AgentController agentM1 = anotherContainer.createNewAgent("AgentManager1", "Agents.AgentManager", args2);
+        agentM.start();
+        agentM1.start();
+
         //Thread.sleep(5000);
         AgentController agentManuf = anotherContainer.createNewAgent("AgentManuf", "Agents.AgentManufacturer", null);
         agentManuf.start();
-
     }
 
     public static void main(String[] args) throws StaleProxyException, InterruptedException {
         runtime = Runtime.instance();
         startMainContainer();
-        //Thread.sleep(10000);
         startMyContainer();
     }
 }

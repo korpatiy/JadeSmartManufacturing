@@ -9,6 +9,7 @@ public class HasMaterial implements Predicate {
     public List materials = null;
     public Product product = null;
 
+
     public List getMaterials() {
         return materials;
     }

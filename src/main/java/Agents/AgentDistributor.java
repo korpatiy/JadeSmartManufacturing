@@ -98,7 +98,7 @@ public class AgentDistributor extends Agent {
                     order.addReceiver(manager);
                     order.setLanguage(codec.getName());
                     order.setOntology(ontology.getName());
-                    order.setConversationId(Constants.CONVERSATION_ID);
+                    order.setConversationId(Constants.DISTRIBUTOR_MANAGER);
                     order.setReplyWith("order" + System.currentTimeMillis());
 
                     Product table = new Product();
@@ -124,7 +124,7 @@ public class AgentDistributor extends Agent {
                         e.printStackTrace();
                     }
                     send(order);
-                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId(Constants.CONVERSATION_ID),
+                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId(Constants.DISTRIBUTOR_MANAGER),
                             MessageTemplate.MatchInReplyTo(order.getReplyWith()));
                     step = 3;
                     System.out.println("[" + getLocalName() +

@@ -1,5 +1,6 @@
 package Agents;
 
+import API.Constants;
 import ManufactureOntology.ManufactureOntology;
 import ManufactureOntology.Predicates.HasMaterial;
 import jade.content.ContentElement;
@@ -42,8 +43,8 @@ public class AgentManager extends Agent {
         }
 
         System.out.println("Manager-Agent " + getAID().getName() + " is ready.");
-        this.contentManager.registerLanguage(codec);
-        this.contentManager.registerOntology(ontology);
+        contentManager.registerLanguage(codec);
+        contentManager.registerOntology(ontology);
 
         addBehaviour(new OfferRequests());
         addBehaviour(new ApplyOffer());
@@ -53,7 +54,7 @@ public class AgentManager extends Agent {
     private void findServices(Agent myAgent) {
         DFAgentDescription template = new DFAgentDescription();
         ServiceDescription sd = new ServiceDescription();
-        sd.setType("manager-manufacturer");
+        sd.setType(Constants.MANUFACTURER_TYPE);
         //ServiceDescription sd1 = new ServiceDescription();
         //sd1.setType("manager-collector");
 
@@ -123,140 +124,11 @@ public class AgentManager extends Agent {
 
                 send(reply);
                 findServices(myAgent);
-                //working();
-                //working(myAgent);
-                //addBehaviour(new test());
             } else {
                 block();
             }
-            // working();
         }
     }
-
-    private void startManage() {
-        FSMBehaviour fsmBehaviour = new FSMBehaviour(this) {
-            @Override
-            public int onEnd() {
-                System.out.println("[" + getLocalName() +
-                        "]: завершил работу над продуктом...");
-                //переработать завершение -> согласовать с выше стоящими поведениями
-                return 0;
-            }
-        };
-
-        fsmBehaviour.registerFirstState(new OneShotBehaviour() {
-            @Override
-            public void action() {
-                System.out.println("[" + getLocalName() +
-                        "]: Приступил к работе над продуктом...");
-            }
-        }, "A");
-
-        //распределение
-        fsmBehaviour.registerState(new Behaviour() {
-
-            int step = 0;
-            int dcount = 4;
-
-            @Override
-            public void action() {
-                switch (step) {
-                    case 0:
-                        ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
-                        for (int i = 0; i < manufacturerAgents.length; i++) {
-                            cfp.addReceiver(manufacturerAgents[i]);
-                        }
-                        cfp.setConversationId("manager-manufacturer");
-                        cfp.setReplyWith("msg" + System.currentTimeMillis());
-                        send(cfp);
-                        step = 1;
-                        break;
-                    case 1:
-
-                        break;
-                }
-            }
-
-            @Override
-            public boolean done() {
-                return step == 4;
-            }
-        }, "B");
-
-
-
-    }
-
-    private void working() {
-
-        FSMBehaviour compFSM = new FSMBehaviour(this) {
-            @Override
-            public int onEnd() {
-                System.out.println("FSM Behavior completed successfully!");
-                return 0;
-            }
-        };
-
-        compFSM.registerFirstState(new OneShotBehaviour(this) {
-            int c = 0;
-
-            @Override
-            public void action() {
-                System.out.println("complement all the X Behavior");
-                c++;
-            }
-
-            @Override
-            public int onEnd() {
-                return (c > 4 ? 1 : 0);
-            }
-        }, "X");
-
-        compFSM.registerState(new OneShotBehaviour(this) {
-
-            public void action() {
-                System.out.println("complement all of Z Behavior");
-            }
-
-            public int onEnd() {
-                return 2;
-            }
-        }, "Z");
-        compFSM.registerLastState(new OneShotBehaviour(this) {
-
-            public void action() {
-                System.out.println("Running my last behavior.");
-            }
-        }, "Y");
-        compFSM.registerTransition("X", "Z", 0);
-        compFSM.registerTransition("X", "Y", 1);
-        compFSM.registerDefaultTransition("Z", "X", new String[]{"X", "Z"});
-        addBehaviour(compFSM);
-    }
-
-    /*private class ManageProduct extends SequentialBehaviour {
-
-        private int step = 0;
-
-        @Override
-        public void action() {
-            findServices(myAgent);
-            System.out.println("[" + getLocalName() + "] Приступил к выполнению");
-            switch (step) {
-                case 0:
-
-
-                    step = 1;
-                    break;
-
-            }
-        }
-
-        @Override
-        public boolean done() {
-            return step == 2;
-        }
-    }*/
 
     @Override
     protected void takeDown() {
