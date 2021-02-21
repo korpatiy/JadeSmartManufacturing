@@ -9,7 +9,7 @@ import jade.core.Agent;
 
 public abstract class AbstractAgent extends Agent {
 
-    protected ContentManager myContentManager = getContentManager();
-    protected Codec codec = new SLCodec();
-    protected Ontology ontology = ManufactureOntology.getInstance();
+    protected final Codec codec = new SLCodec();
+    protected final Ontology ontology = ManufactureOntology.getInstance();
+    protected final ContentManager contentManager = getContentManager();
 }

@@ -3,37 +3,32 @@ package Agents;
 import API.Constants;
 import ManufactureOntology.Concepts.Material;
 import ManufactureOntology.Concepts.Product;
-import ManufactureOntology.ManufactureOntology;
 import ManufactureOntology.Predicates.HasMaterial;
-import jade.content.ContentManager;
 import jade.content.lang.Codec;
-import jade.content.lang.sl.SLCodec;
-import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.TickerBehaviour;
 import jade.domain.AMSService;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.ContractNetInitiator;
 import jade.util.leap.ArrayList;
 import jade.util.leap.List;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class AgentDistributor extends Agent {
+public class AgentDistributor extends AbstractAgent {
 
     private String product;
-    private ContentManager contentManager = getContentManager();
-    private Codec codec = new SLCodec();
-    private Ontology ontology = ManufactureOntology.getInstance();
-    private java.util.List<AMSAgentDescription> managerAgents = null;
+    private java.util.List<AID> managerAgents = null;
     private MessageTemplate mt;
     private AID manager;
     private int replyCnt = 0;
+    private java.util.List<AID> managers = new java.util.ArrayList<>();
 
     @Override
     protected void setup() {
@@ -47,10 +42,11 @@ public class AgentDistributor extends Agent {
             doDelete();
         }
 
-        findManagers();
-        this.contentManager.registerLanguage(codec);
-        this.contentManager.registerOntology(ontology);
+        contentManager.registerLanguage(codec);
+        contentManager.registerOntology(ontology);
+
         addBehaviour(new sendStartMessage());
+
     }
 
     private class sendStartMessage extends Behaviour {
@@ -62,14 +58,21 @@ public class AgentDistributor extends Agent {
             switch (step) {
                 //посылка сообщения
                 case 0:
+                   /* try {
+                        Thread.sleep(20000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }*/
+                    findManagers();
                     ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
-                    managerAgents.forEach(agent -> cfp.addReceiver(agent.getName()));
-                    cfp.setConversationId("distributor-manager");
+                    managerAgents.forEach(cfp::addReceiver);
+                    cfp.setConversationId(Constants.DISTRIBUTOR_MANAGER);
                     cfp.setReplyWith("msg" + System.currentTimeMillis());
                     cfp.setContent(product);
+
+                    //cfp.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
                     myAgent.send(cfp);
-                    //System.out.println("Message send to Manager");
-                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId("distributor-manager"),
+                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId(Constants.DISTRIBUTOR_MANAGER),
                             MessageTemplate.MatchInReplyTo(cfp.getReplyWith()));
                     step = 1;
                     System.out.println("[" + getLocalName() +
@@ -79,9 +82,10 @@ public class AgentDistributor extends Agent {
                 case 1:
                     ACLMessage reply = myAgent.receive(mt);
                     if (reply != null) {
-                        if (reply.getPerformative() == ACLMessage.PROPOSE)
+                        if (reply.getPerformative() == ACLMessage.PROPOSE) {
                             manager = reply.getSender();
-                        else
+                            //managers.add(reply.getSender());
+                        } else
                             System.out.println("[" + getLocalName() +
                                     "] отказ от менеджера " + reply.getSender().getLocalName());
                         replyCnt++;
@@ -93,8 +97,9 @@ public class AgentDistributor extends Agent {
                     break;
                 //отправка заказа
                 case 2:
+                    // ЗДЕСЬ!!!!Проверка на пустой список или отсутвие менеджера вообще
                     ACLMessage order = new ACLMessage(ACLMessage.ACCEPT_PROPOSAL);
-
+                    //managers.forEach(order::addReceiver);
                     order.addReceiver(manager);
                     order.setLanguage(codec.getName());
                     order.setOntology(ontology.getName());
@@ -128,24 +133,24 @@ public class AgentDistributor extends Agent {
                             MessageTemplate.MatchInReplyTo(order.getReplyWith()));
                     step = 3;
                     System.out.println("[" + getLocalName() +
-                            "]: Заказ отправлен менеджеру");
+                            "]: Заказ отправлен менеджеру" + manager.getLocalName());
+
                     break;
                 case 3:
                     reply = receive(mt);
                     if (reply != null) {
                         if (reply.getPerformative() == ACLMessage.INFORM) {
                             System.out.println("[" + getLocalName() +
-                                    "] Заказ принят менеджером " + reply.getSender().getLocalName());
-                            doDelete();
+                                    "] Получил отчет от " + reply.getSender().getLocalName());
+                            //doDelete();
                         }
-                        step = 4;
+                        // step = 4;
                     } else {
                         block();
                     }
                     break;
             }
         }
-
 
         @Override
         public boolean done() {
@@ -157,15 +162,16 @@ public class AgentDistributor extends Agent {
         AMSAgentDescription[] agents = null;
         try {
             SearchConstraints c = new SearchConstraints();
-            c.setMaxResults(new Long(-1));
+            c.setMaxResults(-1L);
             agents = AMSService.search(this, new AMSAgentDescription(), c);
         } catch (Exception e) {
             System.out.println("Problem searching AMS: " + e);
             e.printStackTrace();
         }
+        assert agents != null;
         managerAgents = Arrays.stream(agents)
-                .filter(agent -> agent.getName().getLocalName().contains("Manager"))
-                .collect(Collectors.toList());
+                .map(AMSAgentDescription::getName)
+                .filter(name -> name.getLocalName().contains("Manager")).collect(Collectors.toList());
     }
 
     @Override

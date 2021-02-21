@@ -1,16 +1,11 @@
 package Agents;
 
 import API.Constants;
-import ManufactureOntology.ManufactureOntology;
 import ManufactureOntology.Predicates.HasMaterial;
 import jade.content.ContentElement;
-import jade.content.ContentManager;
 import jade.content.lang.Codec;
-import jade.content.lang.sl.SLCodec;
-import jade.content.onto.Ontology;
 import jade.content.onto.OntologyException;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -18,17 +13,27 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.FIPAProtocolNames;
 import jade.util.leap.ArrayList;
 import jade.util.leap.List;
 
-public class AgentManager extends Agent {
+import java.util.Arrays;
+import java.util.Date;
+import java.util.stream.Collectors;
+
+import static jade.core.behaviours.ParallelBehaviour.WHEN_ALL;
+
+public class AgentManager extends AbstractAgent {
 
     private String product;
-    private ContentManager contentManager = getContentManager();
-    private Codec codec = new SLCodec();
-    private Ontology ontology = ManufactureOntology.getInstance();
+    boolean t = false;
     private List orders = new ArrayList();
-    private AID[] manufacturerAgents;
+    private java.util.List<AID> manufacturerAgents;
+    private java.util.List<AID> verifierAgents;
+    private MessageTemplate mt;
+    private final DFAgentDescription template = new DFAgentDescription();
+    private final ServiceDescription sd = new ServiceDescription();
+    private boolean isWorking = false;
 
     @Override
     protected void setup() {
@@ -46,32 +51,27 @@ public class AgentManager extends Agent {
         contentManager.registerLanguage(codec);
         contentManager.registerOntology(ontology);
 
-        addBehaviour(new OfferRequests());
+        addBehaviour(new GetOfferRequests());
         addBehaviour(new ApplyOffer());
-        //working();
     }
 
-    private void findServices(Agent myAgent) {
-        DFAgentDescription template = new DFAgentDescription();
-        ServiceDescription sd = new ServiceDescription();
-        sd.setType(Constants.MANUFACTURER_TYPE);
-        //ServiceDescription sd1 = new ServiceDescription();
-        //sd1.setType("manager-collector");
+    private void finServices() throws FIPAException {
+        manufacturerAgents = serviceSearcher(Constants.MANUFACTURER_TYPE);
+        verifierAgents = serviceSearcher(Constants.VERIFIER_TYPE);
 
+    }
+
+    private java.util.List<AID> serviceSearcher(String type) throws FIPAException {
+        sd.setType(type);
         template.addServices(sd);
-        try {
-            DFAgentDescription[] result = DFService.search(myAgent, template);
-            manufacturerAgents = new AID[result.length];
-            for (int i = 0; i < result.length; i++) {
-                manufacturerAgents[i] = result[i].getName();
-            }
-        } catch (FIPAException e) {
-            e.printStackTrace();
-        }
-
+        java.util.List<AID> list = Arrays.stream(DFService.search(this, template))
+                .map(DFAgentDescription::getName)
+                .collect(Collectors.toList());
+        template.removeServices(sd);
+        return list;
     }
 
-    private class OfferRequests extends CyclicBehaviour {
+    private class GetOfferRequests extends CyclicBehaviour {
 
         @Override
         public void action() {
@@ -119,16 +119,147 @@ public class AgentManager extends Agent {
                 if (p instanceof HasMaterial) {
                     hasMaterial = (HasMaterial) p;
                 }
+
+                //РЕАЛИЗАЦИЯ ОСНОВГО РАБОЫТ МЕНЕДЕЖДРА.
+                //ФОРМИРОВАНИЕ ОТЧЕТА ДИСТРИБЬЮТОРУ
+
                 ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);
 
                 send(reply);
-                findServices(myAgent);
+                try {
+                    finServices();
+                } catch (FIPAException e) {
+                    e.printStackTrace();
+                }
+                /*isWorking = true;
+                addBehaviour(new WakerBehaviour(myAgent, 10000) {
+                    @Override
+                    protected void onWake() {
+                        System.out.println(myAgent.getLocalName() + " im wake up!");
+                        isWorking = false;
+                        ACLMessage reply = msg.createReply();
+                        reply.setPerformative(ACLMessage.INFORM);
+
+                        send(reply);
+                        try {
+                            finServices();
+                        } catch (FIPAException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });*/
+                //startManage();
             } else {
                 block();
             }
         }
     }
+
+    private class Send extends Behaviour {
+
+        int step = 0;
+        private AID worker;
+
+        @Override
+        public void action() {
+            switch (step) {
+                case 0:
+                    ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+                    manufacturerAgents.forEach(request::addReceiver);
+                    request.setConversationId(Constants.MANAGER_MANUFACTURER);
+                    request.setReplyWith("msg" + System.currentTimeMillis());
+                    request.setContent("detail");
+                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId(Constants.MANAGER_MANUFACTURER),
+                            MessageTemplate.MatchInReplyTo(request.getReplyWith()));
+                    send(request);
+                    step = 1;
+                    break;
+                case 1:
+                    ACLMessage reply = myAgent.receive(mt);
+                    if (reply != null) {
+                        if (reply.getPerformative() == ACLMessage.AGREE) {
+                            worker = reply.getSender();
+                            System.out.println("ok agree");
+                        }
+                        step = 2;
+                    } else {
+                        block();
+                    }
+                    break;
+                case 2:
+                    ACLMessage reply1 = myAgent.receive(mt);
+                    if (reply1 != null) {
+                        if (reply1.getPerformative() == ACLMessage.INFORM)
+                            System.out.println("ok inform");
+                        step = 3;
+                    } else {
+                        block();
+                    }
+                    break;
+            }
+        }
+
+        @Override
+        public boolean done() {
+            return step == 3;
+        }
+    }
+
+    private void startManage() {
+
+        System.out.println("[" + getLocalName() +
+                "] начал менеджинг");
+
+        SequentialBehaviour seqB = new SequentialBehaviour();
+        addBehaviour(seqB);
+
+        ParallelBehaviour parB = new ParallelBehaviour(this, WHEN_ALL) {
+            @Override
+            public int onEnd() {
+                System.out.println("завершил работу");
+                return 0;
+            }
+        };
+        seqB.addSubBehaviour(parB);
+
+        for (int i = 0; i < 4; i++) {
+            System.out.println("iter" + i);
+            parB.addSubBehaviour(new Send());
+        }
+
+        seqB.addSubBehaviour(new OneShotBehaviour() {
+            @Override
+            public void action() {
+                System.out.println("end");
+            }
+        });
+    }
+
+    //обработка
+       /* parallelBehaviour.addSubBehaviour(new SimpleBehaviour() {
+
+            @Override
+            public void action() {
+                if(t)
+                System.out.println("te");
+                t=false;
+            }
+
+            @Override
+            public boolean done() {
+                return t;
+            }
+        });*/
+
+    //проверка
+        /*parallelBehaviour.addSubBehaviour(new CyclicBehaviour() {
+            @Override
+            public void action() {
+
+            }
+        });*/
+
 
     @Override
     protected void takeDown() {

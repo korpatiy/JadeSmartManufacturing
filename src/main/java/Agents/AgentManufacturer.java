@@ -1,12 +1,6 @@
 package Agents;
 
 import API.Constants;
-import ManufactureOntology.ManufactureOntology;
-import jade.content.ContentManager;
-import jade.content.lang.Codec;
-import jade.content.lang.sl.SLCodec;
-import jade.content.onto.Ontology;
-import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
@@ -14,12 +8,11 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.FIPAProtocolNames;
 
-public class AgentManufacturer extends Agent {
+public class AgentManufacturer extends AbstractAgent {
 
-    private ContentManager contentManager = getContentManager();
-    private Codec codec = new SLCodec();
-    private Ontology ontology = ManufactureOntology.getInstance();
+
     private boolean isWorking = false;
 
     @Override
@@ -29,17 +22,52 @@ public class AgentManufacturer extends Agent {
         ServiceDescription sd = new ServiceDescription();
         sd.setType(Constants.MANUFACTURER_TYPE);
         sd.setName(getLocalName());
-        //sd.addOntologies(ManufactureOntology.getInstance().getName());
         dfd.addServices(sd);
-        //dfd.addOntologies(ManufactureOntology.getInstance().getName());
-        this.contentManager.registerOntology(ontology);
-        this.contentManager.registerLanguage(codec);
+        contentManager.registerOntology(ontology);
+        contentManager.registerLanguage(codec);
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-        startWorking();
+        //startWorking();
+        addBehaviour(new GetOfferRequest());
+    }
+
+    private class GetOfferRequest extends CyclicBehaviour {
+
+        @Override
+        public void action() {
+            MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.REQUEST);
+            ACLMessage msg = myAgent.receive(mt);
+            if (msg != null) {
+                ACLMessage reply = msg.createReply();
+                if (!isWorking) {
+                    reply.setPerformative(ACLMessage.AGREE);
+                    isWorking=true;
+                    reply.setContent("ok");
+                    System.out.println("[" + getLocalName() +
+                            "] принял " + msg.getContent());
+                } else {
+                    reply.setPerformative(ACLMessage.REFUSE);
+                    System.out.println("[" + getLocalName() +
+                            "] отказ");
+                }
+                send(reply);
+
+                block(5000);
+                isWorking = false;
+
+                ACLMessage reply2 = msg.createReply();
+                reply2.setPerformative(ACLMessage.INFORM);
+                reply2.setContent("ok");
+                send(reply2);
+
+                //isWorking = false;
+            } else {
+                block();
+            }
+        }
     }
 
     private void startWorking() {
@@ -78,8 +106,6 @@ public class AgentManufacturer extends Agent {
                 ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
                 step++;
             }
-
-
 
             @Override
             public boolean done() {

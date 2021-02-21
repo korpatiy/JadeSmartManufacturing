@@ -1,72 +1,72 @@
 package Agents;
 
 import jade.core.Agent;
-import jade.core.behaviours.FSMBehaviour;
-import jade.core.behaviours.OneShotBehaviour;
-import jade.core.behaviours.SimpleBehaviour;
+import jade.core.behaviours.*;
+
+import static jade.core.behaviours.ParallelBehaviour.WHEN_ALL;
 
 public class Test extends Agent {
     protected void setup() {
 
-        FSMBehaviour compFSM = new FSMBehaviour(this) {
+        System.out.println("Hi! I am the agent " + getLocalName());
+        System.out.println("I'll execute three behaviors concurrently");
+
+        ParallelBehaviour s = new ParallelBehaviour(this, WHEN_ALL){
+
             public int onEnd() {
-                System.out.println("FSM Behavior completed successfully!");
+                System.out.println("Behavior finalized with success!");
                 return 0;
             }
         };
 
-        // The first state registration - Behavior X
-        compFSM.registerFirstState(new SimpleBehaviour(this) {
-            int c = 0;
+        addBehaviour(s);
 
-            public void action() {
-                System.out.println("complement all the X Behavior");
-                c++;
+        s.addSubBehaviour(new SimpleBehaviour(this){
+            int quantity =1;
+            public void action(){
+                System.out.println("Behavior 1: Executing for the "+ quantity + " time");
+                quantity = quantity +1;
             }
 
-            @Override
+            public boolean done(){
+                if(quantity==4) {
+                    System.out.println("Behavior 1 - Finalized");
+                    return true;
+                }else
+                    return false;
+            }
+        });
+
+        s.addSubBehaviour(new SimpleBehaviour(this) {
+            int quantity =1;
+            public void action() {
+                System.out.println("Behavior 2: Executing for the " + quantity + " time");
+                quantity = quantity +1;
+            }
+
             public boolean done() {
-                return true;
+                if(quantity==8) {
+                    System.out.println("Behavior 2 - Finalized");
+                    return true;
+                }else
+                    return false;
             }
+        });
 
-            public int onEnd() {
-                return (c > 4 ? 1 : 0);
-            }
-        }, "X");
-
-        // The second state registration - Behavior Z
-        compFSM.registerState(new OneShotBehaviour(this) {
-
+        s.addSubBehaviour(new SimpleBehaviour(this){
+            int quantity =1;
             public void action() {
-                System.out.println("complement all of Z Behavior");
+                System.out.println("Behavior 3: Executing for the"+ quantity + " time");
+                quantity = quantity +1;
             }
 
-            public int onEnd() {
-                return 2;
+            public boolean done() {
+                if( quantity==10) {
+                    System.out.println(" Behavior 3 - Finalized");
+                    return true;
+                }else
+                    return false;
             }
-        }, "Z");
-
-        // The third and final state registration - Behavior Z
-        compFSM.registerLastState(new OneShotBehaviour(this) {
-
-            public void action() {
-                System.out.println("Running my last behavior.");
-            }
-        }, "Y");
-
-        // Definition of transactions
-        // Transaction behavior X to Z, if onEnd () X behavior returns 0
-        compFSM.registerTransition("X", "Z", 0);
-
-        // Transaction behavior X to Y if onEnd () X behavior returns 1
-        compFSM.registerTransition("X", "Y", 1);
-
-
-        // Default transition setting (no matter what type of return)
-        // As the state machine is finite, need to reset the states of X and Z Sring [] { "X", "Z"}
-        compFSM.registerDefaultTransition("Z", "X", new String[]{"X", "Z"});
-
-        // Trigger the behavior as state machine
-        addBehaviour(compFSM);
+        });
     }
 }
