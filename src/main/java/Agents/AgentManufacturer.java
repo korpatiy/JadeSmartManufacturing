@@ -55,9 +55,6 @@ public class AgentManufacturer extends AbstractAgent {
                 }
                 send(reply);
 
-                block(5000);
-                isWorking = false;
-
                 ACLMessage reply2 = msg.createReply();
                 reply2.setPerformative(ACLMessage.INFORM);
                 reply2.setContent("ok");

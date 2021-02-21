@@ -9,6 +9,7 @@ import jade.content.onto.OntologyException;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.TickerBehaviour;
+import jade.core.behaviours.WakerBehaviour;
 import jade.domain.AMSService;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
@@ -19,6 +20,8 @@ import jade.util.leap.ArrayList;
 import jade.util.leap.List;
 
 import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 public class AgentDistributor extends AbstractAgent {
@@ -45,7 +48,84 @@ public class AgentDistributor extends AbstractAgent {
         contentManager.registerLanguage(codec);
         contentManager.registerOntology(ontology);
 
-        addBehaviour(new sendStartMessage());
+        //addBehaviour(new sendStartMessage());
+        findManagers();
+        ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
+        managerAgents.forEach(cfp::addReceiver);
+        cfp.setConversationId(Constants.DISTRIBUTOR_MANAGER);
+        cfp.setReplyWith("msg" + System.currentTimeMillis());
+        cfp.setContent(product);
+        addBehaviour(new TickerBehaviour(this, 7000) {
+            @Override
+            protected void onTick() {
+                addBehaviour(new ContractNetInitiator(myAgent, cfp) {
+
+                    private AID manager;
+
+                    @Override
+                    protected void handlePropose(ACLMessage propose, Vector acceptances) {
+                        System.out.println("get propose from " + propose.getSender().getLocalName());
+                        manager = propose.getSender();
+                    }
+
+                    @Override
+                    protected void handleRefuse(ACLMessage refuse) {
+                        System.out.println("refuse from" + refuse.getSender().getLocalName());
+                    }
+
+                    @Override
+                    protected void handleAllResponses(Vector responses, Vector acceptances) {
+                        //ACLMessage reply = msg.createReply();
+                        Enumeration e = responses.elements();
+
+                        int iter = 0;
+                        while (e.hasMoreElements()) {
+                            ACLMessage msg = (ACLMessage) e.nextElement();
+                            ACLMessage reply = msg.createReply();
+                            if (msg.getPerformative() == ACLMessage.PROPOSE) {
+                                reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                                reply.setLanguage(codec.getName());
+                                reply.setOntology(ontology.getName());
+                                Product table = new Product();
+                                Material wood = new Material();
+                                Material wood1 = new Material();
+                                table.setId(1);
+                                table.setName("Classic table");
+                                wood.setId(1);
+                                wood.setName("Wood");
+                                wood1.setId(2);
+                                wood1.setName("Wood2");
+
+                                HasMaterial hasMaterial = new HasMaterial();
+                                hasMaterial.setProduct(table);
+                                List materials = new ArrayList();
+                                materials.add(wood);
+                                materials.add(wood1);
+                                hasMaterial.setMaterials(materials);
+
+                                try {
+                                    contentManager.fillContent(reply, hasMaterial);
+                                } catch (Codec.CodecException | OntologyException exception) {
+                                    exception.printStackTrace();
+                                }
+
+                                System.out.println("высылаю проопасл" + msg.getSender().getLocalName());
+                                acceptances.addElement(reply);
+                            } else {
+                                reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
+                                System.out.println("реджект" + msg.getSender().getLocalName());
+                                acceptances.addElement(reply);
+                            }
+                        }
+                    }
+
+                    @Override
+                    protected void handleInform(ACLMessage inform) {
+                        System.out.println("отчет от " + inform.getSender().getLocalName());
+                    }
+                });
+            }
+        });
 
     }
 

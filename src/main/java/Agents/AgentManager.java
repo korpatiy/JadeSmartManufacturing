@@ -8,17 +8,21 @@ import jade.content.onto.OntologyException;
 import jade.core.AID;
 import jade.core.behaviours.*;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
+import jade.domain.FIPAAgentManagement.*;
 import jade.domain.FIPAException;
+import jade.domain.RequestFIPAServiceBehaviour;
+import jade.domain.RequestManagementBehaviour;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.ContractNetInitiator;
+import jade.proto.ContractNetResponder;
 import jade.proto.FIPAProtocolNames;
 import jade.util.leap.ArrayList;
 import jade.util.leap.List;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Vector;
 import java.util.stream.Collectors;
 
 import static jade.core.behaviours.ParallelBehaviour.WHEN_ALL;
@@ -50,9 +54,53 @@ public class AgentManager extends AbstractAgent {
         System.out.println("Manager-Agent " + getAID().getName() + " is ready.");
         contentManager.registerLanguage(codec);
         contentManager.registerOntology(ontology);
+        MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.CFP);
+        addBehaviour(new ContractNetResponder(this, mt) {
+            @Override
+            protected ACLMessage handleCfp(ACLMessage cfp) throws RefuseException, FailureException, NotUnderstoodException {
+                ACLMessage reply = cfp.createReply();
+                if (isWorking) {
+                    reply.setPerformative(ACLMessage.REFUSE);
+                    System.out.println("[" + getLocalName() +
+                            "] Не готов принять заказ");
+                    reply.setContent("Не найден продукт");
+                } else {
+                    reply.setPerformative(ACLMessage.PROPOSE);
+                    System.out.println("[" + getLocalName() +
+                            "] Готов Принять заказ");
+                }
+                return reply;
+            }
 
-        addBehaviour(new GetOfferRequests());
-        addBehaviour(new ApplyOffer());
+            @Override
+            protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
+                isWorking = true;
+                ACLMessage reply = accept.createReply();
+                addBehaviour(new WakerBehaviour(myAgent, 10000) {
+                    @Override
+                    protected void onWake() {
+                        System.out.println(myAgent.getLocalName() + " im wake up!");
+                        isWorking = false;
+                        ACLMessage reply = accept.createReply();
+                        reply.setPerformative(ACLMessage.INFORM);
+                        try {
+                            finServices();
+                        } catch (FIPAException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
+                return reply;
+            }
+
+            @Override
+            protected void handleRejectProposal(ACLMessage cfp, ACLMessage propose, ACLMessage reject) {
+                System.out.println("reject");
+            }
+        });
+
+        //addBehaviour(new GetOfferRequests());
+        // addBehaviour(new ApplyOffer());
     }
 
     private void finServices() throws FIPAException {
@@ -82,7 +130,7 @@ public class AgentManager extends AbstractAgent {
                 System.out.println("[" + getLocalName() +
                         "] Принял CFP сообщение от дистрибютора");
                 ACLMessage reply = msg.createReply();
-                if (!product.equals(msg.getContent())) {
+                if (isWorking) {
                     reply.setPerformative(ACLMessage.REFUSE);
                     System.out.println("[" + getLocalName() +
                             "] Не готов принять заказ");
@@ -123,7 +171,7 @@ public class AgentManager extends AbstractAgent {
                 //РЕАЛИЗАЦИЯ ОСНОВГО РАБОЫТ МЕНЕДЕЖДРА.
                 //ФОРМИРОВАНИЕ ОТЧЕТА ДИСТРИБЬЮТОРУ
 
-                ACLMessage reply = msg.createReply();
+                /*ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);
 
                 send(reply);
@@ -131,8 +179,8 @@ public class AgentManager extends AbstractAgent {
                     finServices();
                 } catch (FIPAException e) {
                     e.printStackTrace();
-                }
-                /*isWorking = true;
+                }*/
+                isWorking = true;
                 addBehaviour(new WakerBehaviour(myAgent, 10000) {
                     @Override
                     protected void onWake() {
@@ -148,7 +196,7 @@ public class AgentManager extends AbstractAgent {
                             e.printStackTrace();
                         }
                     }
-                });*/
+                });
                 //startManage();
             } else {
                 block();
@@ -223,10 +271,29 @@ public class AgentManager extends AbstractAgent {
         };
         seqB.addSubBehaviour(parB);
 
-        for (int i = 0; i < 4; i++) {
+        //new RequestFIPAServiceBehaviour()
+
+        /*for (int i = 0; i < 4; i++) {
             System.out.println("iter" + i);
-            parB.addSubBehaviour(new Send());
-        }
+            ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
+            manufacturerAgents.forEach(request::addReceiver);
+            request.setConversationId(Constants.MANAGER_MANUFACTURER);
+            request.setReplyWith("msg" + System.currentTimeMillis());
+            parB.addSubBehaviour(new ContractNetInitiator(this, request)
+            {
+                private AID worker;
+                @Override
+                protected void handlePropose(ACLMessage propose, Vector acceptances) {
+                    worker = propose.getSender();
+                }
+
+                @Override
+                protected void handleAllResponses(Vector responses, Vector acceptances) {
+
+                }
+
+            });
+        }*/
 
         seqB.addSubBehaviour(new OneShotBehaviour() {
             @Override
