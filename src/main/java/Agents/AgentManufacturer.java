@@ -44,26 +44,29 @@ public class AgentManufacturer extends AbstractAgent {
                 ACLMessage reply = msg.createReply();
                 if (!isWorking) {
                     reply.setPerformative(ACLMessage.AGREE);
-                    isWorking=true;
                     reply.setContent("ok");
+                    //send(reply);
                     System.out.println("[" + getLocalName() +
                             "] принял " + msg.getContent());
                 } else {
                     reply.setPerformative(ACLMessage.REFUSE);
                     System.out.println("[" + getLocalName() +
                             "] отказ");
+                    //send(reply);
                 }
                 send(reply);
+                isWorking = true;
+                addBehaviour(new WakerBehaviour(myAgent, 10000) {
+                    @Override
+                    protected void onWake() {
+                        isWorking = false;
 
-                block(5000);
-                isWorking = false;
-
-                ACLMessage reply2 = msg.createReply();
-                reply2.setPerformative(ACLMessage.INFORM);
-                reply2.setContent("ok");
-                send(reply2);
-
-                //isWorking = false;
+                        ACLMessage reply = msg.createReply();
+                        reply.setPerformative(ACLMessage.INFORM);
+                        reply.setContent("ok");
+                        send(reply);
+                    }
+                });
             } else {
                 block();
             }

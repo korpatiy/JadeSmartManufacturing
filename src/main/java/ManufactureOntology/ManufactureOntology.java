@@ -1,5 +1,6 @@
 package ManufactureOntology;
 
+import ManufactureOntology.Concepts.Detail;
 import ManufactureOntology.Concepts.Material;
 import ManufactureOntology.Concepts.Product;
 import ManufactureOntology.Predicates.HasMaterial;
@@ -51,6 +52,12 @@ public class ManufactureOntology extends Ontology {
         materialSchema.add(NAME, stringSchema, ObjectSchema.OPTIONAL);
         materialSchema.add(ID, integerSchema, ObjectSchema.OPTIONAL);
 
+        ConceptSchema detailSchema = new ConceptSchema("DETAIL");
+        detailSchema.add(NAME, stringSchema, ObjectSchema.OPTIONAL);
+        detailSchema.add(ID, integerSchema, ObjectSchema.OPTIONAL);
+        productSchema.add("DETAILS", detailSchema, 0, ObjectSchema.UNLIMITED);
+
+        add(detailSchema, Detail.class);
         add(productSchema, Product.class);
         add(materialSchema, Material.class);
 
@@ -58,8 +65,9 @@ public class ManufactureOntology extends Ontology {
 
         PredicateSchema hasMaterialSchema = new PredicateSchema(HAS_MATERIAL);
 
-        hasMaterialSchema.add(PRODUCT, productSchema);
-        hasMaterialSchema.add(MATERIALS,materialsSchema);
+        //hasMaterialSchema.add(PRODUCT, productSchema);
+        hasMaterialSchema.add("Object", ObjectSchema.getBaseSchema());
+        hasMaterialSchema.add(MATERIALS, materialsSchema);
 
         add(hasMaterialSchema, HasMaterial.class);
     }

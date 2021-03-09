@@ -13,15 +13,11 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.proto.FIPAProtocolNames;
 import jade.util.leap.ArrayList;
 import jade.util.leap.List;
 
 import java.util.Arrays;
-import java.util.Date;
 import java.util.stream.Collectors;
-
-import static jade.core.behaviours.ParallelBehaviour.WHEN_ALL;
 
 public class AgentManager extends AbstractAgent {
 
@@ -34,6 +30,7 @@ public class AgentManager extends AbstractAgent {
     private final DFAgentDescription template = new DFAgentDescription();
     private final ServiceDescription sd = new ServiceDescription();
     private boolean isWorking = false;
+    private boolean end = false;
 
     @Override
     protected void setup() {
@@ -120,83 +117,78 @@ public class AgentManager extends AbstractAgent {
                     hasMaterial = (HasMaterial) p;
                 }
 
-                //РЕАЛИЗАЦИЯ ОСНОВГО РАБОЫТ МЕНЕДЕЖДРА.
+                //РЕАЛИЗАЦИЯ ОСНОВГО РАБОТЫ МЕНЕДЕЖДРА.
                 //ФОРМИРОВАНИЕ ОТЧЕТА ДИСТРИБЬЮТОРУ
-
-                ACLMessage reply = msg.createReply();
-                reply.setPerformative(ACLMessage.INFORM);
-
-                send(reply);
                 try {
                     finServices();
                 } catch (FIPAException e) {
                     e.printStackTrace();
                 }
-                /*isWorking = true;
-                addBehaviour(new WakerBehaviour(myAgent, 10000) {
-                    @Override
-                    protected void onWake() {
-                        System.out.println(myAgent.getLocalName() + " im wake up!");
-                        isWorking = false;
-                        ACLMessage reply = msg.createReply();
-                        reply.setPerformative(ACLMessage.INFORM);
+                manageDetail();
+                //addBehaviour(new SendDetail());
+                ACLMessage reply = msg.createReply();
+                reply.setPerformative(ACLMessage.INFORM);
+                send(reply);
 
-                        send(reply);
-                        try {
-                            finServices();
-                        } catch (FIPAException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                });*/
-                //startManage();
             } else {
                 block();
             }
         }
     }
 
-    private class Send extends Behaviour {
 
+    private class SendDetail extends Behaviour {
         int step = 0;
         private AID worker;
+        MessageTemplate mmt;
 
         @Override
         public void action() {
             switch (step) {
-                case 0:
+                case 0 -> {
+                    System.out.println("[" + getLocalName() +
+                            "] отправил деталь");
                     ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
                     manufacturerAgents.forEach(request::addReceiver);
                     request.setConversationId(Constants.MANAGER_MANUFACTURER);
                     request.setReplyWith("msg" + System.currentTimeMillis());
                     request.setContent("detail");
-                    mt = MessageTemplate.and(MessageTemplate.MatchConversationId(Constants.MANAGER_MANUFACTURER),
+                    mmt = MessageTemplate.and(MessageTemplate.MatchConversationId(Constants.MANAGER_MANUFACTURER),
                             MessageTemplate.MatchInReplyTo(request.getReplyWith()));
                     send(request);
                     step = 1;
-                    break;
-                case 1:
-                    ACLMessage reply = myAgent.receive(mt);
+                }
+                case 1 -> {
+                    ACLMessage reply = myAgent.receive(mmt);
                     if (reply != null) {
                         if (reply.getPerformative() == ACLMessage.AGREE) {
-                            worker = reply.getSender();
-                            System.out.println("ok agree");
+                            //worker = reply.getSender();
+                            System.out.println("[" + getLocalName() +
+                                    "] ожидаю результатов от" + reply.getSender().getLocalName());
+                            step = 2;
+                        } else {
+                            System.out.println("отказ");
+                            step = 3;
                         }
-                        step = 2;
                     } else {
                         block();
                     }
-                    break;
-                case 2:
-                    ACLMessage reply1 = myAgent.receive(mt);
+                }
+                case 2 -> {
+                    ACLMessage reply1 = myAgent.blockingReceive(mmt);
                     if (reply1 != null) {
                         if (reply1.getPerformative() == ACLMessage.INFORM)
-                            System.out.println("ok inform");
+                            System.out.println("[" + getLocalName() +
+                                    "] принял успешный результат от" + reply1.getSender().getLocalName());
+                        else {
+                            System.out.println("[" + getLocalName() +
+                                    "] принял отрицательный результат от" + reply1.getSender().getLocalName());
+                        }
                         step = 3;
                     } else {
                         block();
                     }
-                    break;
+                }
             }
         }
 
@@ -204,62 +196,50 @@ public class AgentManager extends AbstractAgent {
         public boolean done() {
             return step == 3;
         }
+
+        // разбить на 2 варианта. Агент может отказаться
+        @Override
+        public int onEnd() {
+            return 1;
+        }
     }
 
-    private void startManage() {
 
-        System.out.println("[" + getLocalName() +
-                "] начал менеджинг");
+    private void manageDetail() {
 
-        SequentialBehaviour seqB = new SequentialBehaviour();
-        addBehaviour(seqB);
-
-        ParallelBehaviour parB = new ParallelBehaviour(this, WHEN_ALL) {
+        FSMBehaviour fsmB = new FSMBehaviour(this) {
             @Override
             public int onEnd() {
-                System.out.println("завершил работу");
+                System.out.println("Закончил работу над деталью");
                 return 0;
             }
         };
-        seqB.addSubBehaviour(parB);
+        //резка
+        fsmB.registerFirstState(new SendDetail(), "A");
 
-        for (int i = 0; i < 4; i++) {
-            System.out.println("iter" + i);
-            parB.addSubBehaviour(new Send());
-        }
-
-        seqB.addSubBehaviour(new OneShotBehaviour() {
+        fsmB.registerState(new OneShotBehaviour() {
             @Override
             public void action() {
-                System.out.println("end");
+                System.out.println("new");
             }
-        });
+
+            @Override
+            public int onEnd() {
+                return 2;
+            }
+        }, "B");
+
+        fsmB.registerLastState(new OneShotBehaviour() {
+            @Override
+            public void action() {
+                System.out.println("кц");
+            }
+        }, "C");
+
+        fsmB.registerTransition("A", "B", 1);
+        fsmB.registerTransition("B", "C", 2);
+        addBehaviour(fsmB);
     }
-
-    //обработка
-       /* parallelBehaviour.addSubBehaviour(new SimpleBehaviour() {
-
-            @Override
-            public void action() {
-                if(t)
-                System.out.println("te");
-                t=false;
-            }
-
-            @Override
-            public boolean done() {
-                return t;
-            }
-        });*/
-
-    //проверка
-        /*parallelBehaviour.addSubBehaviour(new CyclicBehaviour() {
-            @Override
-            public void action() {
-
-            }
-        });*/
-
 
     @Override
     protected void takeDown() {

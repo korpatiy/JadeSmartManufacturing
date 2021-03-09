@@ -1,11 +1,14 @@
 package Agents;
 
 import API.Constants;
+import ManufactureOntology.Concepts.Detail;
 import ManufactureOntology.Concepts.Material;
 import ManufactureOntology.Concepts.Product;
 import ManufactureOntology.Predicates.HasMaterial;
+import jade.content.ContentElement;
 import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
+import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -44,9 +47,7 @@ public class AgentDistributor extends AbstractAgent {
 
         contentManager.registerLanguage(codec);
         contentManager.registerOntology(ontology);
-
         addBehaviour(new sendStartMessage());
-
     }
 
     private class sendStartMessage extends Behaviour {
@@ -58,7 +59,7 @@ public class AgentDistributor extends AbstractAgent {
             switch (step) {
                 //посылка сообщения
                 case 0:
-                   /* try {
+                    /*try {
                         Thread.sleep(20000);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
@@ -117,14 +118,21 @@ public class AgentDistributor extends AbstractAgent {
                     wood1.setName("Wood2");
 
                     HasMaterial hasMaterial = new HasMaterial();
-                    hasMaterial.setProduct(table);
+                    hasMaterial.setObject(table);
                     List materials = new ArrayList();
                     materials.add(wood);
                     materials.add(wood1);
                     hasMaterial.setMaterials(materials);
 
+                    List deytails = new ArrayList();
+                    Detail x = new Detail();
+                    x.setName("detail");
+                    x.setId(1);
+                    deytails.add(x);
+                    table.setDetails(deytails);
+
                     try {
-                        contentManager.fillContent(order, hasMaterial);
+                        contentManager.fillContent(order, new Action(myAgent.getAID(), table));
                     } catch (Codec.CodecException | OntologyException e) {
                         e.printStackTrace();
                     }

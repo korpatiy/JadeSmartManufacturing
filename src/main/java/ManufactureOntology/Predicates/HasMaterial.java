@@ -7,7 +7,7 @@ import jade.util.leap.List;
 public class HasMaterial implements Predicate {
 
     public List materials = null;
-    public Product product = null;
+    public Object product = null;
 
 
     public List getMaterials() {
@@ -18,11 +18,11 @@ public class HasMaterial implements Predicate {
         this.materials = materials;
     }
 
-    public Product getProduct() {
+    public Object getObject() {
         return product;
     }
 
-    public void setProduct(Product product) {
+    public void setObject(Object product) {
         this.product = product;
     }
 }
