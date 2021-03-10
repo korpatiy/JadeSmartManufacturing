@@ -1,6 +1,6 @@
 package Agents;
 
-import ManufactureOntology.ManufactureOntology;
+import Ontology.ManufactureOntology;
 import jade.content.ContentManager;
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
@@ -9,7 +9,17 @@ import jade.core.Agent;
 
 public abstract class AbstractAgent extends Agent {
 
-    protected final Codec codec = new SLCodec();
-    protected final Ontology ontology = ManufactureOntology.getInstance();
-    protected final ContentManager contentManager = getContentManager();
+    protected Codec codec = new SLCodec();
+    protected Ontology ontology = ManufactureOntology.getInstance();
+    //protected ContentManager contentManager = getContentManager();
+
+    public abstract String getAgentName();
+
+    @Override
+    protected void setup() {
+
+        System.out.println("Agent " + getAgentName() + " is ready.");
+        getContentManager().registerLanguage(codec);
+        getContentManager().registerOntology(ontology);
+    }
 }

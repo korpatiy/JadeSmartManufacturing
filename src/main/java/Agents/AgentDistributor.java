@@ -1,25 +1,19 @@
 package Agents;
 
 import API.Constants;
-import ManufactureOntology.Concepts.Detail;
-import ManufactureOntology.Concepts.Material;
-import ManufactureOntology.Concepts.Product;
-import ManufactureOntology.Predicates.HasMaterial;
-import jade.content.ContentElement;
+import Ontology.actions.SendOperationJournal;
+import Ontology.actions.SendTask;
+import Ontology.concepts.domain.*;
 import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.behaviours.Behaviour;
-import jade.core.behaviours.TickerBehaviour;
 import jade.domain.AMSService;
 import jade.domain.FIPAAgentManagement.AMSAgentDescription;
 import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.proto.ContractNetInitiator;
-import jade.util.leap.ArrayList;
-import jade.util.leap.List;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -31,11 +25,14 @@ public class AgentDistributor extends AbstractAgent {
     private MessageTemplate mt;
     private AID manager;
     private int replyCnt = 0;
-    private java.util.List<AID> managers = new java.util.ArrayList<>();
+
+    public String getAgentName() {
+        return getLocalName();
+    }
 
     @Override
     protected void setup() {
-        System.out.println("Distributor-Agent " + getAID().getName() + " is ready.");
+        super.setup();
         Object[] args = getArguments();
 
         if (args != null && args.length > 0) {
@@ -44,9 +41,6 @@ public class AgentDistributor extends AbstractAgent {
             System.out.println("No product title specified");
             doDelete();
         }
-
-        contentManager.registerLanguage(codec);
-        contentManager.registerOntology(ontology);
         addBehaviour(new sendStartMessage());
     }
 
@@ -106,33 +100,22 @@ public class AgentDistributor extends AbstractAgent {
                     order.setOntology(ontology.getName());
                     order.setConversationId(Constants.DISTRIBUTOR_MANAGER);
                     order.setReplyWith("order" + System.currentTimeMillis());
+                    /*
+                    OperationJournal x = new OperationJournal();
+                    x.setStatus("ok");
+                    SendOperationJournal y = new SendOperationJournal();
+                    y.setOperationJournal(x);*/
+                    Material m = new Material();
+                    m.setName("m1");
+                    Operation x = new Operation();
+                    x.setName("oper1");
+                    x.addMaterials(m);
+                    SendTask y = new SendTask();
+                    y.setOperation(x);
 
-                    Product table = new Product();
-                    Material wood = new Material();
-                    Material wood1 = new Material();
-                    table.setId(1);
-                    table.setName("Classic table");
-                    wood.setId(1);
-                    wood.setName("Wood");
-                    wood1.setId(2);
-                    wood1.setName("Wood2");
-
-                    HasMaterial hasMaterial = new HasMaterial();
-                    hasMaterial.setObject(table);
-                    List materials = new ArrayList();
-                    materials.add(wood);
-                    materials.add(wood1);
-                    hasMaterial.setMaterials(materials);
-
-                    List deytails = new ArrayList();
-                    Detail x = new Detail();
-                    x.setName("detail");
-                    x.setId(1);
-                    deytails.add(x);
-                    table.setDetails(deytails);
 
                     try {
-                        contentManager.fillContent(order, new Action(myAgent.getAID(), table));
+                        getContentManager().fillContent(order, new Action(getAID(), y));
                     } catch (Codec.CodecException | OntologyException e) {
                         e.printStackTrace();
                     }

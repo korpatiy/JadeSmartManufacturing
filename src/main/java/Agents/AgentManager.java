@@ -1,10 +1,11 @@
 package Agents;
 
 import API.Constants;
-import ManufactureOntology.Predicates.HasMaterial;
+import jade.content.Concept;
 import jade.content.ContentElement;
 import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
+import jade.content.onto.basic.Action;
 import jade.core.AID;
 import jade.core.behaviours.*;
 import jade.domain.DFService;
@@ -22,19 +23,19 @@ import java.util.stream.Collectors;
 public class AgentManager extends AbstractAgent {
 
     private String product;
-    boolean t = false;
-    private List orders = new ArrayList();
     private java.util.List<AID> manufacturerAgents;
     private java.util.List<AID> verifierAgents;
     private MessageTemplate mt;
     private final DFAgentDescription template = new DFAgentDescription();
     private final ServiceDescription sd = new ServiceDescription();
-    private boolean isWorking = false;
-    private boolean end = false;
+
+    public String getAgentName() {
+        return getLocalName();
+    }
 
     @Override
     protected void setup() {
-
+        super.setup();
         Object[] args = getArguments();
 
         if (args != null && args.length > 0) {
@@ -43,19 +44,13 @@ public class AgentManager extends AbstractAgent {
             System.out.println("No product title specified");
             doDelete();
         }
-
-        System.out.println("Manager-Agent " + getAID().getName() + " is ready.");
-        contentManager.registerLanguage(codec);
-        contentManager.registerOntology(ontology);
-
         addBehaviour(new GetOfferRequests());
         addBehaviour(new ApplyOffer());
     }
 
     private void finServices() throws FIPAException {
         manufacturerAgents = serviceSearcher(Constants.MANUFACTURER_TYPE);
-        verifierAgents = serviceSearcher(Constants.VERIFIER_TYPE);
-
+        // verifierAgents = serviceSearcher(Constants.VERIFIER_TYPE);
     }
 
     private java.util.List<AID> serviceSearcher(String type) throws FIPAException {
@@ -106,16 +101,22 @@ public class AgentManager extends AbstractAgent {
             if (msg != null) {
                 System.out.println("[" + getLocalName() +
                         "] Принял ACCEPT сообщение от дистрб");
-                ContentElement p = null;
+                ContentElement content = null;
+
                 try {
-                    p = contentManager.extractContent(msg);
+                    content = getContentManager().extractContent(msg);
                 } catch (Codec.CodecException | OntologyException e) {
                     e.printStackTrace();
                 }
-                HasMaterial hasMaterial = null;
-                if (p instanceof HasMaterial) {
-                    hasMaterial = (HasMaterial) p;
-                }
+                assert content != null;
+                Concept action = ((Action) content).getAction();
+
+
+                /*if (action instanceof _SendOperation) {
+                    _SendOperation sendedOperation = (_SendOperation) action;
+                    GRACE_Ontology.Operation operation =
+                            (GRACE_Ontology.Operation)sendedOperation.get_sendOperation().get(0);
+                    journalDetails.setName(myAgent.getLocalName());*/
 
                 //РЕАЛИЗАЦИЯ ОСНОВГО РАБОТЫ МЕНЕДЕЖДРА.
                 //ФОРМИРОВАНИЕ ОТЧЕТА ДИСТРИБЬЮТОРУ
@@ -129,6 +130,7 @@ public class AgentManager extends AbstractAgent {
                 ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);
                 send(reply);
+
 
             } else {
                 block();
@@ -197,7 +199,7 @@ public class AgentManager extends AbstractAgent {
             return step == 3;
         }
 
-        // разбить на 2 варианта. Агент может отказаться
+        // разбить на  варианта. Агент может отказаться
         @Override
         public int onEnd() {
             return 1;

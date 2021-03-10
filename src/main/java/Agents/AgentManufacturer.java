@@ -12,6 +12,9 @@ import jade.proto.FIPAProtocolNames;
 
 public class AgentManufacturer extends AbstractAgent {
 
+    public String getAgentName() {
+        return getLocalName();
+    }
 
     private boolean isWorking = false;
 
@@ -23,8 +26,6 @@ public class AgentManufacturer extends AbstractAgent {
         sd.setType(Constants.MANUFACTURER_TYPE);
         sd.setName(getLocalName());
         dfd.addServices(sd);
-        contentManager.registerOntology(ontology);
-        contentManager.registerLanguage(codec);
         try {
             DFService.register(this, dfd);
         } catch (FIPAException e) {
