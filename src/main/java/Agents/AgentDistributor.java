@@ -20,11 +20,11 @@ import java.util.stream.Collectors;
 
 public class AgentDistributor extends AbstractAgent {
 
-    private String product;
     private java.util.List<AID> managerAgents = null;
     private MessageTemplate mt;
     private AID manager;
     private int replyCnt = 0;
+    private String kek;
 
     public String getAgentName() {
         return getLocalName();
@@ -33,14 +33,7 @@ public class AgentDistributor extends AbstractAgent {
     @Override
     protected void setup() {
         super.setup();
-        Object[] args = getArguments();
-
-        if (args != null && args.length > 0) {
-            product = (String) args[0];
-        } else {
-            System.out.println("No product title specified");
-            doDelete();
-        }
+        kek = (String) args[1];
         addBehaviour(new sendStartMessage());
     }
 
@@ -163,10 +156,5 @@ public class AgentDistributor extends AbstractAgent {
         managerAgents = Arrays.stream(agents)
                 .map(AMSAgentDescription::getName)
                 .filter(name -> name.getLocalName().contains("Manager")).collect(Collectors.toList());
-    }
-
-    @Override
-    protected void takeDown() {
-        System.out.println("Distributor-Agent " + getAID().getName() + " terminating.");
     }
 }

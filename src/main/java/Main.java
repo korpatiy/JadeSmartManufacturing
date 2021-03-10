@@ -23,12 +23,11 @@ public class Main {
         anotherProfile.setParameter(Profile.CONTAINER_NAME, "Manufacture-Container");
         AgentContainer anotherContainer = runtime.createAgentContainer(anotherProfile);
 
-        String[] args = new String[]{"ClassicTable"};
+        String[] args = new String[]{"ClassicTable", "keks"};
         String[] args2 = new String[]{"ClassicChair"};
 
-        AgentController agentManufacturer = anotherContainer.createNewAgent("AgentManufacturer", "Agents.AgentManufacturer", null);
+        AgentController agentManufacturer = anotherContainer.createNewAgent("AgentManufacturer", "Agents.AgentManufacturer", args);
         agentManufacturer.start();
-
 
         AgentController agentM = anotherContainer.createNewAgent("AgentManager", "Agents.AgentManager", args);
         agentM.start();
@@ -36,7 +35,6 @@ public class Main {
         AgentController agentDistributor = anotherContainer.createNewAgent("DistributorAgent",
                 "Agents.AgentDistributor", args);
         agentDistributor.start();
-
     }
 
     public static void main(String[] args) throws StaleProxyException, InterruptedException {

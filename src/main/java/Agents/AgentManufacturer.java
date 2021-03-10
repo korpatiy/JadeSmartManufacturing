@@ -3,26 +3,18 @@ package Agents;
 import API.Constants;
 import jade.core.behaviours.*;
 import jade.domain.DFService;
-import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.proto.FIPAProtocolNames;
 
 public class AgentManufacturer extends AbstractAgent {
-
-    public String getAgentName() {
-        return getLocalName();
-    }
 
     private boolean isWorking = false;
 
     @Override
     protected void setup() {
-        DFAgentDescription dfd = new DFAgentDescription();
+        super.setup();
         dfd.setName(getAID());
-        ServiceDescription sd = new ServiceDescription();
         sd.setType(Constants.MANUFACTURER_TYPE);
         sd.setName(getLocalName());
         dfd.addServices(sd);
@@ -34,6 +26,7 @@ public class AgentManufacturer extends AbstractAgent {
         //startWorking();
         addBehaviour(new GetOfferRequest());
     }
+
 
     private class GetOfferRequest extends CyclicBehaviour {
 
@@ -61,7 +54,6 @@ public class AgentManufacturer extends AbstractAgent {
                     @Override
                     protected void onWake() {
                         isWorking = false;
-
                         ACLMessage reply = msg.createReply();
                         reply.setPerformative(ACLMessage.INFORM);
                         reply.setContent("ok");

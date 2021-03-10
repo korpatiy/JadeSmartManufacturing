@@ -7,43 +7,28 @@ import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
-import jade.core.behaviours.*;
+import jade.core.behaviours.Behaviour;
+import jade.core.behaviours.CyclicBehaviour;
+import jade.core.behaviours.FSMBehaviour;
+import jade.core.behaviours.OneShotBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
-import jade.util.leap.ArrayList;
-import jade.util.leap.List;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class AgentManager extends AbstractAgent {
 
-    private String product;
     private java.util.List<AID> manufacturerAgents;
     private java.util.List<AID> verifierAgents;
     private MessageTemplate mt;
-    private final DFAgentDescription template = new DFAgentDescription();
-    private final ServiceDescription sd = new ServiceDescription();
-
-    public String getAgentName() {
-        return getLocalName();
-    }
 
     @Override
     protected void setup() {
         super.setup();
-        Object[] args = getArguments();
-
-        if (args != null && args.length > 0) {
-            product = (String) args[0];
-        } else {
-            System.out.println("No product title specified");
-            doDelete();
-        }
         addBehaviour(new GetOfferRequests());
         addBehaviour(new ApplyOffer());
     }
@@ -55,11 +40,11 @@ public class AgentManager extends AbstractAgent {
 
     private java.util.List<AID> serviceSearcher(String type) throws FIPAException {
         sd.setType(type);
-        template.addServices(sd);
-        java.util.List<AID> list = Arrays.stream(DFService.search(this, template))
+        dfd.addServices(sd);
+        java.util.List<AID> list = Arrays.stream(DFService.search(this, dfd))
                 .map(DFAgentDescription::getName)
                 .collect(Collectors.toList());
-        template.removeServices(sd);
+        dfd.removeServices(sd);
         return list;
     }
 
@@ -111,7 +96,6 @@ public class AgentManager extends AbstractAgent {
                 assert content != null;
                 Concept action = ((Action) content).getAction();
 
-
                 /*if (action instanceof _SendOperation) {
                     _SendOperation sendedOperation = (_SendOperation) action;
                     GRACE_Ontology.Operation operation =
@@ -125,19 +109,15 @@ public class AgentManager extends AbstractAgent {
                 } catch (FIPAException e) {
                     e.printStackTrace();
                 }
-                manageDetail();
-                //addBehaviour(new SendDetail());
+                manageProduct();
                 ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);
                 send(reply);
-
-
             } else {
                 block();
             }
         }
     }
-
 
     private class SendDetail extends Behaviour {
         int step = 0;
@@ -206,8 +186,7 @@ public class AgentManager extends AbstractAgent {
         }
     }
 
-
-    private void manageDetail() {
+    private void manageProduct() {
 
         FSMBehaviour fsmB = new FSMBehaviour(this) {
             @Override
@@ -216,7 +195,8 @@ public class AgentManager extends AbstractAgent {
                 return 0;
             }
         };
-        //резка
+
+        //доставка деталей
         fsmB.registerFirstState(new SendDetail(), "A");
 
         fsmB.registerState(new OneShotBehaviour() {
@@ -241,10 +221,5 @@ public class AgentManager extends AbstractAgent {
         fsmB.registerTransition("A", "B", 1);
         fsmB.registerTransition("B", "C", 2);
         addBehaviour(fsmB);
-    }
-
-    @Override
-    protected void takeDown() {
-        System.out.println("Manager-Agent " + getAID().getName() + " terminating.");
     }
 }
