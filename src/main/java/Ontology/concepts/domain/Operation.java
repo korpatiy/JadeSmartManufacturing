@@ -53,8 +53,7 @@ public class Operation extends AbstractItem {
     }
 
     public boolean removeMaterials(Material elem) {
-        boolean result = materials.remove(elem);
-        return result;
+        return materials.remove(elem);
     }
 
     public void clearAllMaterials() {

@@ -26,6 +26,7 @@ public class Function extends AbstractItem {
     return _internalInstanceName;
   }
 
+
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#type
    */
