@@ -1,16 +1,12 @@
 package Agents;
 
-import API.Constants;
 import Ontology.ManufactureOntology;
-import jade.content.ContentManager;
 import jade.content.lang.Codec;
 import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
 import jade.core.Agent;
-import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
-import jade.domain.FIPAException;
 
 public abstract class AbstractAgent extends Agent {
 
