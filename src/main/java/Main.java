@@ -1,4 +1,6 @@
 import Agents.AgentManufacturer;
+import dbConnection.DBConnection;
+import dbConnection.DbQueryExecutor;
 import jade.Boot;
 import jade.core.Profile;
 import jade.core.ProfileImpl;
@@ -6,6 +8,8 @@ import jade.core.Runtime;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
+
+import java.sql.SQLException;
 
 public class Main {
 
@@ -18,13 +22,20 @@ public class Main {
         rma.start();
     }
 
-    public static void startMyContainer() throws StaleProxyException, InterruptedException {
+    public static void startMyContainer() throws StaleProxyException, InterruptedException, SQLException {
         Profile anotherProfile = new ProfileImpl(false);
         anotherProfile.setParameter(Profile.CONTAINER_NAME, "Manufacture-Container");
         AgentContainer anotherContainer = runtime.createAgentContainer(anotherProfile);
 
-        String[] args = new String[]{"ClassicTable", "keks"};
+        String[] args = new String[]{"ClassicTable"};
         String[] args2 = new String[]{"ClassicChair"};
+
+        /*DBConnection dbConnection = DBConnection.getConnection();
+        if (!dbConnection.tryConnect()) {
+            System.out.println("Не удалось подключиться к БД");
+        }*/
+        //DbQueryExecutor dbQueryExecutor = DbQueryExecutor.getDbQueryExecutor();
+        //dbQueryExecutor.seekAgents();
 
         AgentController agentManufacturer = anotherContainer.createNewAgent("AgentManufacturer", "Agents.AgentManufacturer", args);
         agentManufacturer.start();
@@ -37,7 +48,7 @@ public class Main {
         agentDistributor.start();
     }
 
-    public static void main(String[] args) throws StaleProxyException, InterruptedException {
+    public static void main(String[] args) throws StaleProxyException, InterruptedException, SQLException {
         runtime = Runtime.instance();
         startMainContainer();
         startMyContainer();

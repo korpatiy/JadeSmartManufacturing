@@ -13,7 +13,6 @@ public abstract class AbstractAgent extends Agent {
     protected Codec codec = new SLCodec();
     protected Ontology ontology = ManufactureOntology.getInstance();
     protected String product;
-    protected String location;
     protected DFAgentDescription dfd = new DFAgentDescription();
     protected ServiceDescription sd = new ServiceDescription();
     protected Object[] args;

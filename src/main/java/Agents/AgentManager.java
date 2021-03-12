@@ -188,6 +188,7 @@ public class AgentManager extends AbstractAgent {
 
     private void manageProduct() {
 
+
         FSMBehaviour fsmB = new FSMBehaviour(this) {
             @Override
             public int onEnd() {
@@ -196,6 +197,7 @@ public class AgentManager extends AbstractAgent {
             }
         };
 
+        
         //доставка деталей
         fsmB.registerFirstState(new SendDetail(), "A");
 

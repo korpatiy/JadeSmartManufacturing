@@ -24,8 +24,6 @@ public class AgentDistributor extends AbstractAgent {
     private MessageTemplate mt;
     private AID manager;
     private int replyCnt = 0;
-    private String kek;
-
     public String getAgentName() {
         return getLocalName();
     }
@@ -33,7 +31,6 @@ public class AgentDistributor extends AbstractAgent {
     @Override
     protected void setup() {
         super.setup();
-        kek = (String) args[1];
         addBehaviour(new sendStartMessage());
     }
 
