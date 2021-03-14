@@ -123,6 +123,7 @@ public class AgentManager extends AbstractAgent {
         int step = 0;
         private AID worker;
         MessageTemplate mmt;
+        boolean otkaz = false;
 
         @Override
         public void action() {
@@ -150,6 +151,7 @@ public class AgentManager extends AbstractAgent {
                             step = 2;
                         } else {
                             System.out.println("отказ");
+                            otkaz = true;
                             step = 3;
                         }
                     } else {
@@ -182,12 +184,11 @@ public class AgentManager extends AbstractAgent {
         // разбить на  варианта. Агент может отказаться
         @Override
         public int onEnd() {
-            return 1;
+            return otkaz ? 4 : 2;
         }
     }
 
     private void manageProduct() {
-
 
         FSMBehaviour fsmB = new FSMBehaviour(this) {
             @Override
@@ -197,21 +198,20 @@ public class AgentManager extends AbstractAgent {
             }
         };
 
-        
-        //доставка деталей
-        fsmB.registerFirstState(new SendDetail(), "A");
-
-        fsmB.registerState(new OneShotBehaviour() {
+        fsmB.registerFirstState(new OneShotBehaviour() {
             @Override
             public void action() {
-                System.out.println("new");
+                System.out.println("Начинаю производство продукта:");
             }
 
             @Override
             public int onEnd() {
-                return 2;
+                return 1;
             }
-        }, "B");
+        }, "A");
+
+
+        fsmB.registerState(new SendDetail(), "B");
 
         fsmB.registerLastState(new OneShotBehaviour() {
             @Override
@@ -222,6 +222,8 @@ public class AgentManager extends AbstractAgent {
 
         fsmB.registerTransition("A", "B", 1);
         fsmB.registerTransition("B", "C", 2);
+        //fsmB.registerTransition("B", "B", 4);
+        //fsmB.registerTransition("B", "C", 2);
         addBehaviour(fsmB);
     }
 }

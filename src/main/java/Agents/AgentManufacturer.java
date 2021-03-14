@@ -68,79 +68,15 @@ public class AgentManufacturer extends AbstractAgent {
 
     private void startWorking() {
 
-        System.out.println("[" + getLocalName() +
-                "]: начал производство детали...");
-
-        FSMBehaviour fsmBehaviour = new FSMBehaviour(this) {
+        FSMBehaviour fsmB = new FSMBehaviour(this) {
             @Override
             public int onEnd() {
-                System.out.println("FSM Behavior completed successfully!");
+                System.out.println("Закончил работу над материалом");
                 return 0;
             }
         };
 
-        fsmBehaviour.registerFirstState(new WakerBehaviour(this, 1000) {
-            @Override
-            protected void handleElapsedTimeout() {
-                System.out.println("lel");
-            }
 
-            @Override
-            public int onEnd() {
-                return 5;
-            }
-        }, "L");
-
-        fsmBehaviour.registerState(new SimpleBehaviour(this) {
-
-            int step = 0;
-
-            @Override
-            public void action() {
-                System.out.println("[" + getLocalName() +
-                        "]: Отправляю на проверку...");
-                ACLMessage msg = new ACLMessage(ACLMessage.QUERY_IF);
-                step++;
-            }
-
-            @Override
-            public boolean done() {
-                return true;
-            }
-
-            @Override
-            public int onEnd() {
-                return (step > 4 ? 1 : 0);
-            }
-        }, "A");
-
-        fsmBehaviour.registerState(new OneShotBehaviour(this) {
-
-            @Override
-            public void action() {
-                System.out.println("[" + getLocalName() +
-                        "]: Не удалось сделать...");
-            }
-
-            @Override
-            public int onEnd() {
-                return 2;
-            }
-        }, "C");
-
-        fsmBehaviour.registerLastState(new OneShotBehaviour(this) {
-            @Override
-            public void action() {
-                System.out.println("[" + getLocalName() +
-                        "]: Оповещаю менеджера...");
-            }
-        }, "B");
-
-        fsmBehaviour.registerTransition("L", "A", 5);
-        fsmBehaviour.registerTransition("A", "C", 0);
-        fsmBehaviour.registerTransition("A", "B", 1);
-        fsmBehaviour.registerDefaultTransition("C", "L", new String[]{"L", "C"});
-        addBehaviour(fsmBehaviour);
     }
 
     @Override

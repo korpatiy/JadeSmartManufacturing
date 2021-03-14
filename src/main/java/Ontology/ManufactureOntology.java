@@ -38,11 +38,14 @@ public class ManufactureOntology extends Ontology {
     public static final String SENDOPERATIONJOURNAL = "SendOperationJournal";
     public static final String SENDMANUFACTUREJOURNAL_MANUFACTUREJOURNAL = "manufactureJournal";
     public static final String SENDMANUFACTUREJOURNAL = "SendManufactureJournal";
+    public static final String SENDORDER = "SendOrder";
+    public static final String SENDORDER_ORDER = "order";
     public static final String PLAN_OPERATIONS = "operations";
     public static final String PLAN = "Plan";
     public static final String ABSTRACTITEM_NAME = "name";
     public static final String ABSTRACTITEM_DESCRIPTION = "description";
     public static final String ABSTRACTITEM = "AbstractItem";
+    public static final String RESOURCE_TOOLS = "tools";
     public static final String RESOURCE_TYPE = "type";
     public static final String RESOURCE_LOCATION = "location";
     public static final String RESOURCE = "Resource";
@@ -122,6 +125,8 @@ public class ManufactureOntology extends Ontology {
             add(sendOperationJournalSchema, SendOperationJournal.class);
             AgentActionSchema sendTaskSchema = new AgentActionSchema(SENDTASK);
             add(sendTaskSchema, SendTask.class);
+            AgentActionSchema sendOrder = new AgentActionSchema(SENDORDER);
+            add(sendOrder, SendOrder.class);
 
             // adding AID(s)
 
@@ -151,12 +156,14 @@ public class ManufactureOntology extends Ontology {
             abstractJournalSchema.add(ABSTRACTJOURNAL_STATUS, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             resourceSchema.add(RESOURCE_LOCATION, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             resourceSchema.add(RESOURCE_TYPE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
+            resourceSchema.add(RESOURCE_TOOLS, toolSchema, 1, ObjectSchema.UNLIMITED);
             abstractItemSchema.add(ABSTRACTITEM_DESCRIPTION, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             abstractItemSchema.add(ABSTRACTITEM_NAME, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             planSchema.add(PLAN_OPERATIONS, operationSchema, 1, ObjectSchema.UNLIMITED);
             sendManufactureJournalSchema.add(SENDMANUFACTUREJOURNAL_MANUFACTUREJOURNAL, manufactureJournalSchema, ObjectSchema.OPTIONAL);
             sendOperationJournalSchema.add(SENDOPERATIONJOURNAL_OPERATIONJOURNAL, operationJournalSchema, ObjectSchema.OPTIONAL);
             sendTaskSchema.add(SENDTASK_OPERATION, operationSchema, ObjectSchema.OPTIONAL);
+            sendOrder.add(SENDORDER_ORDER, orderSchema, ObjectSchema.OPTIONAL);
 
             // adding name mappings
 

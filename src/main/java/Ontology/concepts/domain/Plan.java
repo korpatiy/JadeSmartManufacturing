@@ -40,8 +40,7 @@ public class Plan extends AbstractItem {
     }
 
     public boolean removeOperations(Operation elem) {
-        boolean result = operations.remove(elem);
-        return result;
+        return operations.remove(elem);
     }
 
     public void clearAllOperations() {

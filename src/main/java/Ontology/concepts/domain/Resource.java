@@ -2,6 +2,9 @@ package Ontology.concepts.domain;
 
 
 import Ontology.concepts.general.AbstractItem;
+import jade.util.leap.ArrayList;
+import jade.util.leap.Iterator;
+import jade.util.leap.List;
 
 /**
  * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Resourse
@@ -51,6 +54,32 @@ public class Resource extends AbstractItem {
 
     public String getType() {
         return this.type;
+    }
+
+    private List tools = new ArrayList();
+
+    public void addMaterials(Tool elem) {
+        tools.add(elem);
+    }
+
+    public boolean removeMaterials(Tool elem) {
+        return tools.remove(elem);
+    }
+
+    public void clearAllMaterials() {
+        tools.clear();
+    }
+
+    public Iterator getAllMaterials() {
+        return tools.iterator();
+    }
+
+    public List getTools() {
+        return tools;
+    }
+
+    public void setTools(List l) {
+        tools = l;
     }
 
 }
