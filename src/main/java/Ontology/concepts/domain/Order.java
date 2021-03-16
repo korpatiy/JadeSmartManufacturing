@@ -53,18 +53,6 @@ public class Order extends AbstractItem {
         return this.dueDate;
     }
 
-    /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#startDate
-     */
-    private String startDate;
-
-    public void setStartDate(String value) {
-        this.startDate = value;
-    }
-
-    public String getStartDate() {
-        return this.startDate;
-    }
 
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#product

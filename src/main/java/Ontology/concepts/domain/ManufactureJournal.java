@@ -40,8 +40,7 @@ public class ManufactureJournal extends AbstractJournal {
     }
 
     public boolean removeOperationJournals(OperationJournal elem) {
-        boolean result = operationJournals.remove(elem);
-        return result;
+        return operationJournals.remove(elem);
     }
 
     public void clearAllOperationJournals() {

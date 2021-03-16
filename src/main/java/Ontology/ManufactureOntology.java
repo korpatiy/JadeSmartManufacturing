@@ -54,7 +54,6 @@ public class ManufactureOntology extends Ontology {
     public static final String ABSTRACTJOURNAL_ENDDATE = "endDate";
     public static final String ABSTRACTJOURNAL = "AbstractJournal";
     public static final String ORDER_PRODUCT = "product";
-    public static final String ORDER_STARTDATE = "startDate";
     public static final String ORDER_DUEDATE = "dueDate";
     public static final String ORDER_QUANTITY = "quantity";
     public static final String ORDER = "Order";
@@ -149,7 +148,6 @@ public class ManufactureOntology extends Ontology {
             failureSchema.add(FAILURE_STATUS, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_QUANTITY, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_DUEDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
-            orderSchema.add(ORDER_STARTDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_PRODUCT, productSchema, ObjectSchema.OPTIONAL);
             abstractJournalSchema.add(ABSTRACTJOURNAL_ENDDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             abstractJournalSchema.add(ABSTRACTJOURNAL_STARTDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
