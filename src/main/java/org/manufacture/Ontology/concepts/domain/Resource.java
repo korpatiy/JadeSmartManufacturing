@@ -56,21 +56,39 @@ public class Resource extends AbstractItem {
         return this.type;
     }
 
+    /**
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#stations
+     */
+    private Station station;
+
+    public void setStations(Station value) {
+        this.station = value;
+    }
+
+    public Station getStations() {
+        return this.station;
+    }
+
+
+    /**
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#tools
+     */
     private List tools = new ArrayList();
 
-    public void addMaterials(Tool elem) {
+    public void addTools(Tool elem) {
         tools.add(elem);
     }
 
-    public boolean removeMaterials(Tool elem) {
-        return tools.remove(elem);
+    public boolean removeTools(Tool elem) {
+        boolean result = tools.remove(elem);
+        return result;
     }
 
-    public void clearAllMaterials() {
+    public void clearAllTools() {
         tools.clear();
     }
 
-    public Iterator getAllMaterials() {
+    public Iterator getAllTools() {
         return tools.iterator();
     }
 

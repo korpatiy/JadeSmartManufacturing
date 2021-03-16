@@ -1,6 +1,9 @@
 package org.manufacture.Ontology.actions;
 
 
+import jade.util.leap.ArrayList;
+import jade.util.leap.Iterator;
+import jade.util.leap.List;
 import org.manufacture.Ontology.concepts.domain.ManufactureJournal;
 import jade.content.AgentAction;
 
@@ -29,16 +32,21 @@ public class SendManufactureJournal implements AgentAction {
     }
 
     /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#manufactureJournal
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#manufactureJournals
      */
-    private ManufactureJournal manufactureJournal;
-
-    public void setManufactureJournal(ManufactureJournal value) {
-        this.manufactureJournal = value;
+    private List manufactureJournals = new ArrayList();
+    public void addManufactureJournals(ManufactureJournal elem) {
+        manufactureJournals.add(elem);
     }
-
-    public ManufactureJournal getManufactureJournal() {
-        return this.manufactureJournal;
+    public boolean removeManufactureJournals(ManufactureJournal elem) {
+        boolean result = manufactureJournals.remove(elem);
+        return result;
     }
+    public void clearAllManufactureJournals() {
+        manufactureJournals.clear();
+    }
+    public Iterator getAllManufactureJournals() {return manufactureJournals.iterator(); }
+    public List getManufactureJournals() {return manufactureJournals; }
+    public void setManufactureJournals(List l) {manufactureJournals = l; }
 
 }

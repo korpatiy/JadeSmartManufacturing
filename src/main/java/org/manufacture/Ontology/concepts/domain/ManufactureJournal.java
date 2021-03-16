@@ -31,31 +31,32 @@ public class ManufactureJournal extends AbstractJournal {
     }
 
     /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#operationJournals
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#stationJournals
      */
-    private List operationJournals = new ArrayList();
+    private List stationJournals = new ArrayList();
 
-    public void addOperationJournals(OperationJournal elem) {
-        operationJournals.add(elem);
+    public void addStationJournals(StationJournal elem) {
+        stationJournals.add(elem);
     }
 
-    public boolean removeOperationJournals(OperationJournal elem) {
-        return operationJournals.remove(elem);
+    public boolean removeStationJournals(StationJournal elem) {
+        boolean result = stationJournals.remove(elem);
+        return result;
     }
 
-    public void clearAllOperationJournals() {
-        operationJournals.clear();
+    public void clearAllStationJournals() {
+        stationJournals.clear();
     }
 
-    public Iterator getAllOperationJournals() {
-        return operationJournals.iterator();
+    public Iterator getAllStationJournals() {
+        return stationJournals.iterator();
     }
 
-    public List getOperationJournals() {
-        return operationJournals;
+    public List getStationJournals() {
+        return stationJournals;
     }
 
-    public void setOperationJournals(List l) {
-        operationJournals = l;
+    public void setStationJournals(List l) {
+        stationJournals = l;
     }
 }

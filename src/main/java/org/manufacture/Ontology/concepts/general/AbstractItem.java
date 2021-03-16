@@ -1,6 +1,9 @@
 package org.manufacture.Ontology.concepts.general;
 
 import jade.content.Concept;
+import jade.util.leap.ArrayList;
+import jade.util.leap.Iterator;
+import jade.util.leap.List;
 
 /**
  * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#AbstractItem

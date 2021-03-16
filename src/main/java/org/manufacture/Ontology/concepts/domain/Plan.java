@@ -31,31 +31,21 @@ public class Plan extends AbstractItem {
     }
 
     /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#operations
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#stations
      */
-    private List operations = new ArrayList();
-
-    public void addOperations(Operation elem) {
-        operations.add(elem);
+    private List stations = new ArrayList();
+    public void addStations(Station elem) {
+        stations.add(elem);
     }
-
-    public boolean removeOperations(Operation elem) {
-        return operations.remove(elem);
+    public boolean removeStations(Station elem) {
+        boolean result = stations.remove(elem);
+        return result;
     }
-
-    public void clearAllOperations() {
-        operations.clear();
+    public void clearAllStations() {
+        stations.clear();
     }
+    public Iterator getAllStations() {return stations.iterator(); }
+    public List getStations() {return stations; }
+    public void setStations(List l) {stations = l; }
 
-    public Iterator getAllOperations() {
-        return operations.iterator();
-    }
-
-    public List getOperations() {
-        return operations;
-    }
-
-    public void setOperations(List l) {
-        operations = l;
-    }
 }

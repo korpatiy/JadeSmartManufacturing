@@ -1,6 +1,9 @@
 package org.manufacture.Ontology.concepts.domain;
 
 
+import jade.util.leap.ArrayList;
+import jade.util.leap.Iterator;
+import jade.util.leap.List;
 import org.manufacture.Ontology.concepts.general.AbstractItem;
 
 /**
@@ -39,7 +42,7 @@ public class Order extends AbstractItem {
     public int getQuantity() {
         return this.quantity;
     }
-    
+
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#dueDate
      */
@@ -52,7 +55,6 @@ public class Order extends AbstractItem {
     public String getDueDate() {
         return this.dueDate;
     }
-
 
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#product
@@ -67,4 +69,46 @@ public class Order extends AbstractItem {
         return this.product;
     }
 
+    /**
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#plan
+     */
+    private Plan plan;
+
+    public void setPlan(Plan value) {
+        this.plan = value;
+    }
+
+    public Plan getPlan() {
+        return this.plan;
+    }
+
+    /**
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#manufactureJournals
+     */
+    private List manufactureJournals = new ArrayList();
+
+    public void addManufactureJournals(ManufactureJournal elem) {
+        manufactureJournals.add(elem);
+    }
+
+    public boolean removeManufactureJournals(ManufactureJournal elem) {
+        boolean result = manufactureJournals.remove(elem);
+        return result;
+    }
+
+    public void clearAllManufactureJournals() {
+        manufactureJournals.clear();
+    }
+
+    public Iterator getAllManufactureJournals() {
+        return manufactureJournals.iterator();
+    }
+
+    public List getManufactureJournals() {
+        return manufactureJournals;
+    }
+
+    public void setManufactureJournals(List l) {
+        manufactureJournals = l;
+    }
 }
