@@ -1,6 +1,7 @@
 package org.manufacture.dbConnection;
 
 import org.manufacture.Ontology.concepts.domain.Resource;
+import org.manufacture.Ontology.concepts.domain.Station;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,20 +22,24 @@ public class DbQueryExecutor {
         return dbQueryExecutor;
     }
 
-    public void seekAgents() throws SQLException {
-        Connection conn = DriverManager.getConnection(ConnectConstants.DB_URL, ConnectConstants.USER, ConnectConstants.PASSWORD);
-        PreparedStatement getAgents = conn.prepareStatement("SELECT * FROM resource");
+    public List<Resource> seekAgents() throws SQLException {
+        Connection connection = DriverManager.getConnection(ConnectConstants.DB_URL, ConnectConstants.USER, ConnectConstants.PASSWORD);
+        PreparedStatement getAgents = connection.prepareStatement("SELECT r.name as rname, s.name as sname, r.description, r.type from resource r JOIN station s ON r.station_id = s.id");
         ResultSet agents = getAgents.executeQuery();
+        System.out.println(agents);
         List<Resource> resources = new ArrayList<>();
         while (agents.next()) {
             Resource agent = new Resource();
-            agent.setName(agents.getString("name"));
-            agent.setDescription(agents.getString("description"));
-            agent.setLocation(agents.getString("location"));
+            agent.setName(agents.getString("rname"));
             agent.setType(agents.getString("type"));
+            //agent.setDescription(agents.getString("description")); упущенно в рамках примера
+            Station station = new Station();
+            station.setName(agents.getString("sname"));
+            //station description упущенно в рамках примера
+            agent.setStation(station);
             resources.add(agent);
         }
-        conn.close();
-        int x = 5;
+        connection.close();
+        return resources;
     }
 }

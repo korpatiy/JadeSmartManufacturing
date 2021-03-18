@@ -33,7 +33,7 @@ public class Operation extends AbstractItem {
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#funtion
      */
-    private Function function;
+    /*private Function function;
 
     public void setFunction(Function value) {
         this.function = value;
@@ -41,7 +41,7 @@ public class Operation extends AbstractItem {
 
     public Function getFunction() {
         return this.function;
-    }
+    }*/
 
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#materials

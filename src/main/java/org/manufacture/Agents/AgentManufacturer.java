@@ -14,15 +14,6 @@ public class AgentManufacturer extends AbstractAgent {
     @Override
     protected void setup() {
         super.setup();
-        dfd.setName(getAID());
-        sd.setType(Constants.MANUFACTURER_TYPE);
-        sd.setName(getLocalName());
-        dfd.addServices(sd);
-        try {
-            DFService.register(this, dfd);
-        } catch (FIPAException e) {
-            e.printStackTrace();
-        }
         //startWorking();
         addBehaviour(new GetOfferRequest());
     }

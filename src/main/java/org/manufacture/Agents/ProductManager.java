@@ -20,7 +20,7 @@ import jade.lang.acl.MessageTemplate;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public class AgentManager extends AbstractAgent {
+public class ProductManager extends AbstractAgent {
 
     private java.util.List<AID> manufacturerAgents;
     private java.util.List<AID> verifierAgents;
@@ -31,21 +31,6 @@ public class AgentManager extends AbstractAgent {
         super.setup();
         addBehaviour(new GetOfferRequests());
         addBehaviour(new ApplyOffer());
-    }
-
-    private void finServices() throws FIPAException {
-        manufacturerAgents = serviceSearcher(Constants.MANUFACTURER_TYPE);
-        // verifierAgents = serviceSearcher(Constants.VERIFIER_TYPE);
-    }
-
-    private java.util.List<AID> serviceSearcher(String type) throws FIPAException {
-        sd.setType(type);
-        dfd.addServices(sd);
-        java.util.List<AID> list = Arrays.stream(DFService.search(this, dfd))
-                .map(DFAgentDescription::getName)
-                .collect(Collectors.toList());
-        dfd.removeServices(sd);
-        return list;
     }
 
     private class GetOfferRequests extends CyclicBehaviour {
@@ -59,7 +44,7 @@ public class AgentManager extends AbstractAgent {
                 System.out.println("[" + getLocalName() +
                         "] Принял CFP сообщение от дистрибютора");
                 ACLMessage reply = msg.createReply();
-                if (!product.equals(msg.getContent())) {
+                if (!getStation().equals(msg.getContent())) {
                     reply.setPerformative(ACLMessage.REFUSE);
                     System.out.println("[" + getLocalName() +
                             "] Не готов принять заказ");
@@ -104,11 +89,11 @@ public class AgentManager extends AbstractAgent {
 
                 //РЕАЛИЗАЦИЯ ОСНОВГО РАБОТЫ МЕНЕДЕЖДРА.
                 //ФОРМИРОВАНИЕ ОТЧЕТА ДИСТРИБЬЮТОРУ
-                try {
+               /* try {
                     finServices();
                 } catch (FIPAException e) {
                     e.printStackTrace();
-                }
+                }*/
                 manageProduct();
                 ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);

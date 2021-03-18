@@ -11,9 +11,11 @@ public class Constants {
     // public static final String DISTRIBUTOR_MANAGER = "distributor-manager";
 
     /**
-    * Тип агента
-    **/
+     * Agents types
+     **/
+    public static final String MANAGER_TYPE = "manager";
     public static final String MANUFACTURER_TYPE = "product-manufacturer";
     public static final String COLLECTOR_TYPE = "product-collector";
     public static final String VERIFIER_TYPE = "product-verifier";
+    public static final String WAREHOUSE_MANAGER_TYPE = "warehouse-manager";
 }

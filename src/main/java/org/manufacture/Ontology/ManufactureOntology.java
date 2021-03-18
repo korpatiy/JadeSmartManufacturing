@@ -148,7 +148,7 @@ public class ManufactureOntology extends Ontology {
             operationJournalSchema.add(OPERATIONJOURNAL_FAILURES, failureSchema, 0, ObjectSchema.UNLIMITED);
             operationJournalSchema.add(OPERATIONJOURNAL_OPERATION, operationSchema, ObjectSchema.OPTIONAL);
             operationJournalSchema.add(OPERATIONJOURNAL_RESOURCE, resourceSchema, ObjectSchema.OPTIONAL);
-            operationSchema.add(OPERATION_FUNCTION, functionSchema, ObjectSchema.OPTIONAL);
+            //operationSchema.add(OPERATION_FUNCTION, functionSchema, ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_MATERIALS, materialSchema, 1, ObjectSchema.UNLIMITED);
             operationSchema.add(OPERATION_SETUP, setupSchema, ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_DURATION, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
@@ -157,6 +157,7 @@ public class ManufactureOntology extends Ontology {
             failureSchema.add(FAILURE_OCCURRENCEDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             failureSchema.add(FAILURE_TYPE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             failureSchema.add(FAILURE_STATUS, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
+            setupSchema.add("tool", toolSchema, ObjectSchema.OPTIONAL);
             stationJournalSchema.add(STATIONJOURNAL_OPERATIONJOURNALS, operationJournalSchema, 0, ObjectSchema.UNLIMITED);
             orderSchema.add(ORDER_QUANTITY, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_PLAN, planSchema, 1, ObjectSchema.UNLIMITED);

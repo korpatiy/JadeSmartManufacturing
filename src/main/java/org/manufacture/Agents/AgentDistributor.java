@@ -1,5 +1,6 @@
 package org.manufacture.Agents;
 
+import jade.domain.FIPAException;
 import org.manufacture.constants.Constants;
 import org.manufacture.Ontology.actions.SendTask;
 import org.manufacture.Ontology.concepts.domain.*;
@@ -19,21 +20,23 @@ import java.util.stream.Collectors;
 
 public class AgentDistributor extends AbstractAgent {
 
-    private java.util.List<AID> managerAgents = null;
+    private java.util.List<AID> managerAgents;
     private MessageTemplate mt;
     private AID manager;
     private int replyCnt = 0;
-    public String getAgentName() {
-        return getLocalName();
-    }
 
     @Override
     protected void setup() {
         super.setup();
-        addBehaviour(new sendStartMessage());
+        try {
+            managerAgents = findServices(Constants.MANAGER_TYPE);
+        } catch (FIPAException e) {
+            e.printStackTrace();
+        }
+        addBehaviour(new SendingOrder());
     }
 
-    private class sendStartMessage extends Behaviour {
+    private class SendingOrder extends Behaviour {
 
         private int step = 0;
 
@@ -47,12 +50,11 @@ public class AgentDistributor extends AbstractAgent {
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }*/
-                    findManagers();
                     ACLMessage cfp = new ACLMessage(ACLMessage.CFP);
                     managerAgents.forEach(cfp::addReceiver);
                     cfp.setConversationId(Constants.DISTRIBUTOR_MANAGER);
                     cfp.setReplyWith("msg" + System.currentTimeMillis());
-                    cfp.setContent(product);
+                    cfp.setContent("product");
 
                     //cfp.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
                     myAgent.send(cfp);
@@ -138,6 +140,9 @@ public class AgentDistributor extends AbstractAgent {
         }
     }
 
+    /**
+     * deprecated
+     */
     private void findManagers() {
         AMSAgentDescription[] agents = null;
         try {

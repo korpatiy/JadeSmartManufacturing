@@ -31,19 +31,6 @@ public class Resource extends AbstractItem {
     }
 
     /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#location
-     */
-    private String location;
-
-    public void setLocation(String value) {
-        this.location = value;
-    }
-
-    public String getLocation() {
-        return this.location;
-    }
-
-    /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#type
      */
     private String type;
@@ -61,11 +48,11 @@ public class Resource extends AbstractItem {
      */
     private Station station;
 
-    public void setStations(Station value) {
+    public void setStation(Station value) {
         this.station = value;
     }
 
-    public Station getStations() {
+    public Station getStation() {
         return this.station;
     }
 

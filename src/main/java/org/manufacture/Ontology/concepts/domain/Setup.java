@@ -26,4 +26,14 @@ public class Setup extends AbstractItem {
     public String toString() {
         return _internalInstanceName;
     }
+
+    private Tool tool;
+
+    public Tool getTool() {
+        return tool;
+    }
+
+    public void setTool(Tool tool) {
+        this.tool = tool;
+    }
 }
