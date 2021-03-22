@@ -16,10 +16,12 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractAgent extends Agent {
 
+    //to private
     protected Codec codec = new SLCodec();
     protected Ontology ontology = ManufactureOntology.getInstance();
     private String type;
     private String station;
+    //to private
     protected DFAgentDescription dfd = new DFAgentDescription();
     protected ServiceDescription sd = new ServiceDescription();
 
@@ -41,15 +43,18 @@ public abstract class AbstractAgent extends Agent {
 
     @Override
     protected void setup() {
-        setFields();
-        if (!getLocalName().contains("Distributor"))
+        if (!getLocalName().contains("Distributor")) {
+            setFields();
             registerService();
+        }
         System.out.println("Agent " + getLocalName() + " is ready.");
         getContentManager().registerLanguage(codec);
         getContentManager().registerOntology(ontology);
     }
 
     protected java.util.List<AID> findServices(String type) throws FIPAException {
+        DFAgentDescription dfd = new DFAgentDescription();
+        ServiceDescription sd = new ServiceDescription();
         sd.setType(type);
         dfd.addServices(sd);
         java.util.List<AID> list = Arrays.stream(DFService.search(this, dfd))

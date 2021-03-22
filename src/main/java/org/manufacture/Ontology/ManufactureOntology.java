@@ -75,7 +75,7 @@ public class ManufactureOntology extends Ontology {
     public static final String MATERIAL = "Material";
     public static final String OPERATION_DURATION = "duration";
     public static final String OPERATION_SETUP = "setup";
-    public static final String OPERATION_MATERIALS = "materials";
+    public static final String OPERATION_MATERIAL = "material";
     public static final String OPERATION_FUNCTION = "function";
     public static final String OPERATION = "Operation";
     public static final String TOOL = "Tool";
@@ -138,6 +138,8 @@ public class ManufactureOntology extends Ontology {
             add(sendSupplySchema, SendSupply.class);
             AgentActionSchema sendTaskSchema = new AgentActionSchema(SENDTASK);
             add(sendTaskSchema, SendTask.class);
+            AgentActionSchema sendTasksSchema = new AgentActionSchema("SendTasks");
+            add(sendTasksSchema, SendTasks.class);
 
             // adding AID(s)
 
@@ -145,14 +147,15 @@ public class ManufactureOntology extends Ontology {
 
 
             // adding fields
+            sendTasksSchema.add("operations", operationSchema, 0, ObjectSchema.UNLIMITED);
             operationJournalSchema.add(OPERATIONJOURNAL_FAILURES, failureSchema, 0, ObjectSchema.UNLIMITED);
             operationJournalSchema.add(OPERATIONJOURNAL_OPERATION, operationSchema, ObjectSchema.OPTIONAL);
             operationJournalSchema.add(OPERATIONJOURNAL_RESOURCE, resourceSchema, ObjectSchema.OPTIONAL);
             //operationSchema.add(OPERATION_FUNCTION, functionSchema, ObjectSchema.OPTIONAL);
-            operationSchema.add(OPERATION_MATERIALS, materialSchema, 1, ObjectSchema.UNLIMITED);
+            operationSchema.add(OPERATION_MATERIAL, materialSchema, ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_SETUP, setupSchema, ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_DURATION, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
-            productSchema.add(PRODUCT_MATERIALS, materialSchema, 1, ObjectSchema.UNLIMITED);
+            productSchema.add(PRODUCT_MATERIALS, materialSchema, 0, ObjectSchema.UNLIMITED);
             manufactureJournalSchema.add(MANUFACTUREJOURNAL_STATIONJOURNALS, stationJournalSchema, 0, ObjectSchema.UNLIMITED);
             failureSchema.add(FAILURE_OCCURRENCEDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             failureSchema.add(FAILURE_TYPE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
@@ -160,7 +163,7 @@ public class ManufactureOntology extends Ontology {
             setupSchema.add("tool", toolSchema, ObjectSchema.OPTIONAL);
             stationJournalSchema.add(STATIONJOURNAL_OPERATIONJOURNALS, operationJournalSchema, 0, ObjectSchema.UNLIMITED);
             orderSchema.add(ORDER_QUANTITY, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
-            orderSchema.add(ORDER_PLAN, planSchema, 1, ObjectSchema.UNLIMITED);
+            orderSchema.add(ORDER_PLAN, planSchema, ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_MANUFACTUREJOURNALS, manufactureJournalSchema, 0, ObjectSchema.UNLIMITED);
             orderSchema.add(ORDER_DUEDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_PRODUCT, productSchema, ObjectSchema.OPTIONAL);
@@ -172,7 +175,7 @@ public class ManufactureOntology extends Ontology {
             resourceSchema.add(RESOURCE_TYPE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             abstractItemSchema.add(ABSTRACTITEM_DESCRIPTION, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             abstractItemSchema.add(ABSTRACTITEM_NAME, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
-            planSchema.add(PLAN_STATIONS, stationSchema, 1, ObjectSchema.UNLIMITED);
+            planSchema.add(PLAN_STATIONS, stationSchema, 0, ObjectSchema.UNLIMITED);
             sendOrderSchema.add(SENDORDER_ORDER, orderSchema, ObjectSchema.OPTIONAL);
             sendManufactureJournalSchema.add(SENDMANUFACTUREJOURNAL_MANUFACTUREJOURNALS, manufactureJournalSchema, 0, ObjectSchema.UNLIMITED);
             sendOperationJournalSchema.add(SENDOPERATIONJOURNAL_OPERATIONJOURNAL, operationJournalSchema, ObjectSchema.OPTIONAL);

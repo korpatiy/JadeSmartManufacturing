@@ -1,6 +1,7 @@
 package org.manufacture.Ontology.concepts.domain;
 
 
+import jade.content.Concept;
 import org.manufacture.Ontology.concepts.general.AbstractItem;
 import jade.util.leap.ArrayList;
 import jade.util.leap.Iterator;
@@ -29,6 +30,8 @@ public class Resource extends AbstractItem {
     public String toString() {
         return _internalInstanceName;
     }
+
+
 
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#type

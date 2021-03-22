@@ -92,8 +92,7 @@ public class Order extends AbstractItem {
     }
 
     public boolean removeManufactureJournals(ManufactureJournal elem) {
-        boolean result = manufactureJournals.remove(elem);
-        return result;
+        return manufactureJournals.remove(elem);
     }
 
     public void clearAllManufactureJournals() {

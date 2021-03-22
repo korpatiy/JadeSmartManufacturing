@@ -6,11 +6,16 @@ import jade.core.Runtime;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
+import org.manufacture.API.QueryExecutorBuilder;
+import org.manufacture.API.QueryExecutorService;
+import org.manufacture.Ontology.concepts.domain.Operation;
 import org.manufacture.Ontology.concepts.domain.Resource;
-import org.manufacture.dbConnection.DbQueryExecutor;
+import org.manufacture.Ontology.concepts.domain.Station;
+import org.manufacture.dbConnection.QueryExecutor;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 public class Main {
 
@@ -30,27 +35,29 @@ public class Main {
         anotherProfile.setParameter(Profile.CONTAINER_NAME, "Manufacture-Container");
         AgentContainer manufactureContainer = runtime.createAgentContainer(anotherProfile);
 
-        // УБРАТЬ ОТСЮДА
-        DbQueryExecutor dbQueryExecutor = DbQueryExecutor.getDbQueryExecutor();
+        QueryExecutorService queryExecutor = QueryExecutor.getQueryExecutor();
 
-        List<Resource> resources = dbQueryExecutor.seekAgents();
+        //need interface resource
+        List<Resource> resources = queryExecutor.seekAgents();
+
         resources.forEach(resource -> {
             Object[] args = new Object[]{resource.getType(), resource.getStation().getName()};
             String className = "org.manufacture.Agents.";
-            if (resource.getName().contains("ProductManager")) {
-                createAgent(manufactureContainer, resource.getName(), args, className + "ProductManager");
-            }
             if (resource.getName().contains("Manufacturer")) {
                 createAgent(manufactureContainer, resource.getName(), args, className + "AgentManufacturer");
             }
             if (resource.getName().contains("Verifier")) {
                 createAgent(manufactureContainer, resource.getName(), args, className + "AgentVerifier");
             }
+            if (resource.getName().contains("ProductManager")) {
+                createAgent(manufactureContainer, resource.getName(), args, className + "ProductManager");
+            }
         });
 
-        /*AgentController agentDistributor = manufactureContainer.createNewAgent("DistributorAgent",
-                "org.manufacture.Agents.AgentDistributor", null);
-        agentDistributor.start();*/
+        Object[] args = new Object[]{"Машина стиральная стандартная", "Стандартный", "today"};
+        AgentController agentDistributor = manufactureContainer.createNewAgent("DistributorAgent",
+                "org.manufacture.Agents.AgentDistributor", args);
+        agentDistributor.start();
     }
 
     private static void createAgent(AgentContainer manufactureContainer, String name, Object[] args, String className) {

@@ -46,7 +46,7 @@ public class Operation extends AbstractItem {
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#materials
      */
-    private List materials = new ArrayList();
+   /* private List materials = new ArrayList();
 
     public void addMaterials(Material elem) {
         materials.add(elem);
@@ -70,6 +70,15 @@ public class Operation extends AbstractItem {
 
     public void setMaterials(List l) {
         materials = l;
+    }*/
+    private Material material;
+
+    public Material getMaterial() {
+        return material;
+    }
+
+    public void setMaterial(Material material) {
+        this.material = material;
     }
 
     /**
