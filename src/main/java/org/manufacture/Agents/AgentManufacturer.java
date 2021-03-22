@@ -1,5 +1,17 @@
 package org.manufacture.Agents;
 
+import jade.content.Concept;
+import jade.content.ContentElement;
+import jade.content.lang.Codec;
+import jade.content.onto.OntologyException;
+import jade.content.onto.basic.Action;
+import jade.core.AID;
+import jade.util.leap.List;
+import org.manufacture.Ontology.actions.SendOrder;
+import org.manufacture.Ontology.actions.SendTasks;
+import org.manufacture.Ontology.concepts.domain.Operation;
+import org.manufacture.Ontology.concepts.domain.OperationJournal;
+import org.manufacture.Ontology.concepts.domain.StationJournal;
 import org.manufacture.constants.Constants;
 import jade.core.behaviours.*;
 import jade.domain.DFService;
@@ -10,11 +22,13 @@ import jade.lang.acl.MessageTemplate;
 public class AgentManufacturer extends AbstractAgent {
 
     private boolean isWorking = false;
+    private List operations;
+    private boolean isDone = false;
+    private StationJournal stationJournal;
 
     @Override
     protected void setup() {
         super.setup();
-        //startWorking();
         addBehaviour(new GetOfferRequest());
     }
 
@@ -29,45 +43,93 @@ public class AgentManufacturer extends AbstractAgent {
                 ACLMessage reply = msg.createReply();
                 if (!isWorking) {
                     reply.setPerformative(ACLMessage.AGREE);
-                    reply.setContent("ok");
-                    //send(reply);
                     System.out.println("[" + getLocalName() +
-                            "] принял " + msg.getContent());
+                            "] принял операции");
+                    processContent(msg);
+                    isWorking = true;
+                    startWorking();
+                    addBehaviour(new SendInform(msg.createReply()));
                 } else {
                     reply.setPerformative(ACLMessage.REFUSE);
                     System.out.println("[" + getLocalName() +
                             "] отказ");
-                    //send(reply);
                 }
                 send(reply);
-                isWorking = true;
-                addBehaviour(new WakerBehaviour(myAgent, 10000) {
-                    @Override
-                    protected void onWake() {
-                        isWorking = false;
-                        ACLMessage reply = msg.createReply();
-                        reply.setPerformative(ACLMessage.INFORM);
-                        reply.setContent("ok");
-                        send(reply);
-                    }
-                });
             } else {
                 block();
+            }
+        }
+
+        private void processContent(ACLMessage msg) {
+            ContentElement content = null;
+            try {
+                content = getContentManager().extractContent(msg);
+            } catch (Codec.CodecException | OntologyException e) {
+                e.printStackTrace();
+            }
+            assert content != null;
+            Concept action = ((Action) content).getAction();
+            if (action instanceof SendTasks) {
+                SendTasks sendTasks = (SendTasks) action;
+                operations = sendTasks.getOperations();
+            }
+        }
+    }
+
+    private class SendInform extends CyclicBehaviour {
+
+        private ACLMessage reply;
+
+        public SendInform(ACLMessage reply) {
+            this.reply = reply;
+        }
+
+        @Override
+        public void action() {
+            if (isDone) {
+                reply.setPerformative(ACLMessage.INFORM);
+                // отчет
+                reply.setContent("ok");
+                send(reply);
+                isWorking = false;
+                isDone = false;
             }
         }
     }
 
     private void startWorking() {
 
-        FSMBehaviour fsmB = new FSMBehaviour(this) {
-            @Override
+        SequentialBehaviour seqBehaviour = new SequentialBehaviour(this) {
             public int onEnd() {
-                System.out.println("Закончил работу над материалом");
+                isDone = true;
+                System.out.println("[" + getLocalName() + "] Закончил работу над операциями");
                 return 0;
             }
         };
 
+        for (int i = 0; i < operations.size(); i++) {
+            Operation operation = (Operation) operations.get(i);
+            //Положение Setup
+            seqBehaviour.addSubBehaviour(new WakerBehaviour(this, 100) {
+                @Override
+                protected void onWake() {
+                    System.out.println("[" + getLocalName() +
+                            "] выполняется " + operation.getName() + " " + operation.getMaterial().getName());
+                   // OperationJournal operationJournal = new OperationJournal();
+                   // operationJournal.setOperation(operation);
+                   // operationJournal.set
+                }
+            });
+           /* seqBehaviour.addSubBehaviour(new OneShotBehaviour() {
+                @Override
+                public void action() {
+                    System.out.println("[" + getLocalName() +
+                            "] выполняется " + operation.getName() + " " + operation.getMaterial().getName());
 
+                }
+            });*/
+        }
+        addBehaviour(seqBehaviour);
     }
 
     @Override
@@ -77,6 +139,5 @@ public class AgentManufacturer extends AbstractAgent {
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-        System.out.println(getAID().getName() + " terminating.");
     }
 }

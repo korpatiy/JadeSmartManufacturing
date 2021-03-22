@@ -2,6 +2,7 @@ package org.manufacture.Agents;
 
 import jade.core.behaviours.*;
 import jade.domain.FIPAException;
+import jade.domain.FIPANames;
 import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.SendTasks;
@@ -27,6 +28,8 @@ public class ProductManager extends AbstractAgent {
 
     private Map<Station, Operation> stationOperationMap;
     private boolean isWorking = false;
+    private String planName;
+    private String productName;
 
     @Override
     protected void setup() {
@@ -83,35 +86,38 @@ public class ProductManager extends AbstractAgent {
             if (msg != null) {
                 System.out.println("[" + getLocalName() +
                         "] Принял ACCEPT сообщение от дистрб");
-                ContentElement content = null;
-                try {
-                    content = getContentManager().extractContent(msg);
-                } catch (Codec.CodecException | OntologyException e) {
-                    e.printStackTrace();
-                }
-                assert content != null;
-                Concept action = ((Action) content).getAction();
-                String planName = null;
-                String productName = null;
-                if (action instanceof SendOrder) {
-                    SendOrder sendOrder = (SendOrder) action;
-                    planName = sendOrder.getOrder().getPlan().getName();
-                    productName = sendOrder.getOrder().getProduct().getName();
-                }
+
+                processContent(msg);
                 //закостылено. Поиск не по плану
                 getStationOperation(planName);
 
                 //РЕАЛИЗАЦИЯ ОСНОВГО РАБОТЫ МЕНЕДЕЖДРА.
                 //ФОРМИРОВАНИЕ ОТЧЕТА ДИСТРИБЬЮТОРУ
                 manageProduct();
-                //addBehaviour(new Ti);
-                
+
+                //переместить в cycle
                 ACLMessage reply = msg.createReply();
                 reply.setPerformative(ACLMessage.INFORM);
                 send(reply);
                 //doDelete();
             } else {
                 block();
+            }
+        }
+
+        private void processContent(ACLMessage msg) {
+            ContentElement content = null;
+            try {
+                content = getContentManager().extractContent(msg);
+            } catch (Codec.CodecException | OntologyException e) {
+                e.printStackTrace();
+            }
+            assert content != null;
+            Concept action = ((Action) content).getAction();
+            if (action instanceof SendOrder) {
+                SendOrder sendOrder = (SendOrder) action;
+                planName = sendOrder.getOrder().getPlan().getName();
+                productName = sendOrder.getOrder().getProduct().getName();
             }
         }
     }
@@ -121,18 +127,20 @@ public class ProductManager extends AbstractAgent {
         private AID worker;
         MessageTemplate mt;
         boolean isAccept = false;
-        private List<Operation> operations;
+        private jade.util.leap.List operations;
         private String manufacturerType;
 
         public SendRequest(List<Operation> operations, String manufacturerType) {
-            this.operations = operations;
+            this.operations = castToJadeList(operations);
             this.manufacturerType = manufacturerType;
         }
 
-       /* private jade.util.leap.List castToJadeList() {
-            jade.util.leap.List operation = new jade.util.leap.ArrayList();
-
-        }*/
+        //Вынести
+        private jade.util.leap.List castToJadeList(List<Operation> operations) {
+            jade.util.leap.List jadeList = new jade.util.leap.ArrayList();
+            operations.forEach(jadeList::add);
+            return jadeList;
+        }
 
         @Override
         public void action() {
@@ -145,12 +153,22 @@ public class ProductManager extends AbstractAgent {
                     }
                     System.out.println("[" + getLocalName() +
                             "] отправляю операции");
+                    //вынести
                     ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
                     request.addReceiver(worker);
                     request.setConversationId(Constants.MANAGER_MANUFACTURER);
                     request.setReplyWith("request" + System.currentTimeMillis());
-                   // SendTasks sendTasks = new SendTasks();
-                   // sendTasks.setOperations((jade.util.leap.List) operations);
+                    request.setLanguage(codec.getName());
+                    request.setOntology(ontology.getName());
+                    request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+                    SendTasks sendTasks = new SendTasks();
+                    sendTasks.setOperations(operations);
+
+                    try {
+                        getContentManager().fillContent(request, new Action(getAID(), sendTasks));
+                    } catch (Codec.CodecException | OntologyException codecException) {
+                        codecException.printStackTrace();
+                    }
 
                     mt = MessageTemplate.and(MessageTemplate.MatchConversationId(Constants.MANAGER_MANUFACTURER),
                             MessageTemplate.MatchInReplyTo(request.getReplyWith()));
@@ -158,12 +176,11 @@ public class ProductManager extends AbstractAgent {
                     step = 1;
                 }
                 case 1 -> {
-                    ACLMessage reply = myAgent.receive(mt);
-                    if (reply != null) {
-                        if (reply.getPerformative() == ACLMessage.AGREE) {
-                            //worker = reply.getSender();
+                    ACLMessage firstReply = myAgent.receive(mt);
+                    if (firstReply != null) {
+                        if (firstReply.getPerformative() == ACLMessage.AGREE) {
                             System.out.println("[" + getLocalName() +
-                                    "] ожидаю результатов от" + reply.getSender().getLocalName());
+                                    "] ожидаю результатов от " + firstReply.getSender().getLocalName());
                             step = 2;
                         } else {
                             System.out.println("отказ");
@@ -175,14 +192,14 @@ public class ProductManager extends AbstractAgent {
                     }
                 }
                 case 2 -> {
-                    ACLMessage reply1 = myAgent.blockingReceive(mt);
-                    if (reply1 != null) {
-                        if (reply1.getPerformative() == ACLMessage.INFORM)
+                    ACLMessage secondReply = myAgent.blockingReceive(mt);
+                    if (secondReply != null) {
+                        if (secondReply.getPerformative() == ACLMessage.INFORM)
                             System.out.println("[" + getLocalName() +
-                                    "] принял успешный результат от" + reply1.getSender().getLocalName());
+                                    "] принял успешный результат от " + secondReply.getSender().getLocalName());
                         else {
                             System.out.println("[" + getLocalName() +
-                                    "] принял отрицательный результат от" + reply1.getSender().getLocalName());
+                                    "] принял отрицательный результат от " + secondReply.getSender().getLocalName());
                         }
                         step = 3;
                     } else {
@@ -228,18 +245,38 @@ public class ProductManager extends AbstractAgent {
             }
         }, "A");
 
+        //List<String> uniqOperations = List.of("Предварительная сборка", "Общая сборка", "Конечная сборка", "Контроль", "Комлпектовка");
+
+        //зафорить
         List<Operation> PAOperations = getOperations("Предварительная сборка");
         fsmB.registerState(new SendRequest(PAOperations, Constants.PA_PRODUCT_MANUFACTURER_TYPE), "B");
+
+        List<Operation> GAOperations = getOperations("Общая сборка");
+        fsmB.registerState(new SendRequest(GAOperations, Constants.GA_PRODUCT_MANUFACTURER_TYPE), "C");
+
+        List<Operation> FAOperations = getOperations("Конечная сборка");
+        fsmB.registerState(new SendRequest(FAOperations, Constants.FA_PRODUCT_MANUFACTURER_TYPE), "D");
+
+        List<Operation> VOperations = getOperations("Контроль");
+        fsmB.registerState(new SendRequest(VOperations, Constants.VERIFIER_TYPE), "E");
+
+        List<Operation> POperations = getOperations("Комлпектовка");
+        fsmB.registerState(new SendRequest(POperations, Constants.PRODUCT_PACKER_TYPE), "F");
 
         fsmB.registerLastState(new OneShotBehaviour() {
             @Override
             public void action() {
                 System.out.println("кц");
             }
-        }, "C");
+        }, "G");
 
         fsmB.registerTransition("A", "B", 1);
         fsmB.registerTransition("B", "C", 2);
+        fsmB.registerTransition("C", "D", 2);
+        fsmB.registerTransition("D", "E", 2);
+        fsmB.registerTransition("E", "F", 2);
+        fsmB.registerTransition("F", "G", 2);
+
         //fsmB.registerTransition("B", "B", 4);
         //fsmB.registerTransition("B", "C", 2);
         addBehaviour(fsmB);

@@ -43,7 +43,7 @@ public class Main {
         resources.forEach(resource -> {
             Object[] args = new Object[]{resource.getType(), resource.getStation().getName()};
             String className = "org.manufacture.Agents.";
-            if (resource.getName().contains("Manufacturer")) {
+            if (resource.getName().contains("Manufacturer") || resource.getName().contains("Verifier") || resource.getName().contains("Packer")) {
                 createAgent(manufactureContainer, resource.getName(), args, className + "AgentManufacturer");
             }
             if (resource.getName().contains("Verifier")) {

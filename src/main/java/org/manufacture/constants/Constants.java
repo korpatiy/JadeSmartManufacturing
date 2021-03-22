@@ -18,7 +18,7 @@ public class Constants {
     public static final String PA_PRODUCT_MANUFACTURER_TYPE = "pre-assembly-product-manufacturer";
     public static final String GA_PRODUCT_MANUFACTURER_TYPE = "general-assembly-product-manufacturer";
     public static final String FA_PRODUCT_MANUFACTURER_TYPE = "final-assembly-product-manufacturer";
-    public static final String COLLECTOR_TYPE = "product-collector";
+    public static final String PRODUCT_PACKER_TYPE = "product-packer";
     public static final String VERIFIER_TYPE = "product-verifier";
     public static final String WAREHOUSE_MANAGER_TYPE = "warehouse-manager";
 }
