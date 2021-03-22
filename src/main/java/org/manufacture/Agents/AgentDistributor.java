@@ -46,11 +46,11 @@ public class AgentDistributor extends AbstractAgent {
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-        try {
+        /*try {
             Thread.sleep(40000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         orderHandler();
         //addBehaviour(new SendingOrder());
     }

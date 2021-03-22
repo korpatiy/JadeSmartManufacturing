@@ -14,6 +14,8 @@ import org.manufacture.Ontology.concepts.domain.Station;
 import org.manufacture.dbConnection.QueryExecutor;
 
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -45,9 +47,6 @@ public class Main {
             String className = "org.manufacture.Agents.";
             if (resource.getName().contains("Manufacturer") || resource.getName().contains("Verifier") || resource.getName().contains("Packer")) {
                 createAgent(manufactureContainer, resource.getName(), args, className + "AgentManufacturer");
-            }
-            if (resource.getName().contains("Verifier")) {
-                createAgent(manufactureContainer, resource.getName(), args, className + "AgentVerifier");
             }
             if (resource.getName().contains("ProductManager")) {
                 createAgent(manufactureContainer, resource.getName(), args, className + "ProductManager");
@@ -81,6 +80,7 @@ public class Main {
      */
     public static void main(String[] args) throws StaleProxyException, SQLException {
         runtime = Runtime.instance();
+
         startMainContainer();
         startManufactureContainer();
     }

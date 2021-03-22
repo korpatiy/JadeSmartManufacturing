@@ -61,7 +61,7 @@ public class QueryExecutor implements QueryExecutorService {
     public Map<Station, Operation> seekPlan(String planName) throws SQLException {
         connection = DriverManager.getConnection(ConnectConstants.DB_URL, ConnectConstants.USER, ConnectConstants.PASSWORD);
         PreparedStatement getStations = connection
-                .prepareStatement("select s.name as s_name, o.name as o_name, s2.name as s2_name, m.name as m_name, tool.name as t_name \n" +
+                .prepareStatement("select s.name as s_name, o.name as o_name, o.duration as duration, s2.name as s2_name, m.name as m_name, tool.name as t_name \n" +
                         "from plan_station_operation \n" +
                         "join station s on s.id = plan_station_operation.station_id\n" +
                         "join operation o on o.id = plan_station_operation.operation_id\n" +
@@ -81,6 +81,7 @@ public class QueryExecutor implements QueryExecutorService {
             operation.setName(resultSet.getString("o_name"));
             operation.setSetup(setup);
             operation.setMaterial(material);
+            operation.setDuration(resultSet.getString("duration"));
             Station station = new Station();
             station.setName(resultSet.getString("s_name"));
             stationOperationMap.put(station, operation);

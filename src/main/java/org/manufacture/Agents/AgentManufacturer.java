@@ -110,14 +110,15 @@ public class AgentManufacturer extends AbstractAgent {
         for (int i = 0; i < operations.size(); i++) {
             Operation operation = (Operation) operations.get(i);
             //Положение Setup
-            seqBehaviour.addSubBehaviour(new WakerBehaviour(this, 100) {
+            seqBehaviour.addSubBehaviour(new WakerBehaviour(this, Long.parseLong(operation.getDuration())) {
                 @Override
                 protected void onWake() {
                     System.out.println("[" + getLocalName() +
                             "] выполняется " + operation.getName() + " " + operation.getMaterial().getName());
-                   // OperationJournal operationJournal = new OperationJournal();
-                   // operationJournal.setOperation(operation);
-                   // operationJournal.set
+                    OperationJournal operationJournal = new OperationJournal();
+                    operationJournal.setOperation(operation);
+                    operationJournal.setStatus(Constants.STATUS_DONE);
+
                 }
             });
            /* seqBehaviour.addSubBehaviour(new OneShotBehaviour() {

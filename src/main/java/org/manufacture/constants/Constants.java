@@ -7,8 +7,6 @@ public class Constants {
      **/
     public static final String DISTRIBUTOR_MANAGER = "distributor-manager";
     public static final String MANAGER_MANUFACTURER = "manager-manufacturer";
-    public static final String MANAGER_COLLECTOR = "manager-collector";
-    // public static final String DISTRIBUTOR_MANAGER = "distributor-manager";
 
     /**
      * Agents types
@@ -21,4 +19,10 @@ public class Constants {
     public static final String PRODUCT_PACKER_TYPE = "product-packer";
     public static final String VERIFIER_TYPE = "product-verifier";
     public static final String WAREHOUSE_MANAGER_TYPE = "warehouse-manager";
+
+    /**
+     * Статусы выполнения
+     */
+    public static final String STATUS_DONE = "done";
+    public static final String STATUS_FAIL = "fail";
 }
