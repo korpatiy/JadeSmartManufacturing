@@ -3,10 +3,7 @@ package org.manufacture.Ontology;
 
 import jade.content.onto.BasicOntology;
 import jade.content.onto.Ontology;
-import jade.content.schema.AgentActionSchema;
-import jade.content.schema.ConceptSchema;
-import jade.content.schema.ObjectSchema;
-import jade.content.schema.TermSchema;
+import jade.content.schema.*;
 import org.manufacture.Ontology.actions.*;
 import org.manufacture.Ontology.concepts.domain.*;
 import org.manufacture.Ontology.concepts.general.*;
@@ -167,8 +164,8 @@ public class ManufactureOntology extends Ontology {
             orderSchema.add(ORDER_MANUFACTUREJOURNALS, manufactureJournalSchema, 0, ObjectSchema.UNLIMITED);
             orderSchema.add(ORDER_DUEDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_PRODUCT, productSchema, ObjectSchema.OPTIONAL);
-            abstractJournalSchema.add(ABSTRACTJOURNAL_ENDDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
-            abstractJournalSchema.add(ABSTRACTJOURNAL_STARTDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
+            abstractJournalSchema.add(ABSTRACTJOURNAL_ENDDATE, (TermSchema) getSchema(BasicOntology.DATE), ObjectSchema.OPTIONAL);
+            abstractJournalSchema.add(ABSTRACTJOURNAL_STARTDATE, (TermSchema) getSchema(BasicOntology.DATE), ObjectSchema.OPTIONAL);
             abstractJournalSchema.add(ABSTRACTJOURNAL_STATUS, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             resourceSchema.add(RESOURCE_STATION, stationSchema, ObjectSchema.OPTIONAL);
             resourceSchema.add(RESOURCE_TOOLS, toolSchema, 1, ObjectSchema.UNLIMITED);

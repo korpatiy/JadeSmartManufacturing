@@ -5,6 +5,9 @@ import jade.content.Concept;
 import jade.util.leap.ArrayList;
 import jade.util.leap.Iterator;
 import jade.util.leap.List;
+
+import java.util.Date;
+
 /**
  * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#AbsctractJournal
  *
@@ -32,26 +35,26 @@ public abstract class AbstractJournal implements Concept {
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#endDate
      */
-    private String endDate;
+    private Date endDate;
 
-    public void setEndDate(String value) {
+    public void setEndDate(Date value) {
         this.endDate = value;
     }
 
-    public String getEndDate() {
+    public Date getEndDate() {
         return this.endDate;
     }
 
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#startDate
      */
-    private String startDate;
+    private Date startDate;
 
-    public void setStartDate(String value) {
+    public void setStartDate(Date value) {
         this.startDate = value;
     }
 
-    public String getStartDate() {
+    public Date getStartDate() {
         return this.startDate;
     }
 

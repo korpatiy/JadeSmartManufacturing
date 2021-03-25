@@ -11,6 +11,7 @@ import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.SendTasks;
 import org.manufacture.Ontology.concepts.domain.Operation;
 import org.manufacture.Ontology.concepts.domain.OperationJournal;
+import org.manufacture.Ontology.concepts.domain.Resource;
 import org.manufacture.Ontology.concepts.domain.StationJournal;
 import org.manufacture.constants.Constants;
 import jade.core.behaviours.*;
@@ -18,6 +19,8 @@ import jade.domain.DFService;
 import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+
+import java.util.Date;
 
 public class AgentManufacturer extends AbstractAgent {
 
@@ -31,7 +34,6 @@ public class AgentManufacturer extends AbstractAgent {
         super.setup();
         addBehaviour(new GetOfferRequest());
     }
-
 
     private class GetOfferRequest extends CyclicBehaviour {
 
@@ -89,7 +91,7 @@ public class AgentManufacturer extends AbstractAgent {
             if (isDone) {
                 reply.setPerformative(ACLMessage.INFORM);
                 // отчет
-                reply.setContent("ok");
+                
                 send(reply);
                 isWorking = false;
                 isDone = false;
@@ -110,25 +112,31 @@ public class AgentManufacturer extends AbstractAgent {
         for (int i = 0; i < operations.size(); i++) {
             Operation operation = (Operation) operations.get(i);
             //Положение Setup
+            Date startDateO = new Date();
             seqBehaviour.addSubBehaviour(new WakerBehaviour(this, Long.parseLong(operation.getDuration())) {
                 @Override
                 protected void onWake() {
                     System.out.println("[" + getLocalName() +
                             "] выполняется " + operation.getName() + " " + operation.getMaterial().getName());
+                    createJournal();
+                }
+
+                private void createJournal() {
+                    Date endDateO = new Date();
+                    Resource resource = new Resource();
+                    resource.setName(getName());
+                    resource.setType(getType());
                     OperationJournal operationJournal = new OperationJournal();
                     operationJournal.setOperation(operation);
                     operationJournal.setStatus(Constants.STATUS_DONE);
-
+                    operationJournal.setStartDate(startDateO);
+                    operationJournal.setEndDate(endDateO);
+                    operationJournal.setResource(resource);
+                    stationJournal.addOperationJournals(operationJournal);
+                    //need
+                    //operationJournal.setFailures();
                 }
             });
-           /* seqBehaviour.addSubBehaviour(new OneShotBehaviour() {
-                @Override
-                public void action() {
-                    System.out.println("[" + getLocalName() +
-                            "] выполняется " + operation.getName() + " " + operation.getMaterial().getName());
-
-                }
-            });*/
         }
         addBehaviour(seqBehaviour);
     }

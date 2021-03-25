@@ -4,25 +4,17 @@ import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
-import jade.core.behaviours.Behaviour;
-import jade.domain.AMSService;
-import jade.domain.FIPAAgentManagement.AMSAgentDescription;
-import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetInitiator;
-import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.actions.SendOrder;
-import org.manufacture.Ontology.actions.SendTask;
 import org.manufacture.Ontology.concepts.domain.*;
 import org.manufacture.constants.Constants;
-import org.manufacture.dbConnection.QueryExecutor;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class AgentDistributor extends AbstractAgent {
 

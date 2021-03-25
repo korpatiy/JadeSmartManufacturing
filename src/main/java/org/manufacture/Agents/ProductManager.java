@@ -277,8 +277,6 @@ public class ProductManager extends AbstractAgent {
         fsmB.registerTransition("E", "F", 2);
         fsmB.registerTransition("F", "G", 2);
 
-        //fsmB.registerTransition("B", "B", 4);
-        //fsmB.registerTransition("B", "C", 2);
         addBehaviour(fsmB);
     }
 
