@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ProductManager extends AbstractAgent {
+public class ProductManager extends ResourceAgent {
 
     private Map<Station, Operation> stationOperationMap;
     private boolean isWorking = false;
@@ -158,8 +158,8 @@ public class ProductManager extends AbstractAgent {
                     request.addReceiver(worker);
                     request.setConversationId(Constants.MANAGER_MANUFACTURER);
                     request.setReplyWith("request" + System.currentTimeMillis());
-                    request.setLanguage(codec.getName());
-                    request.setOntology(ontology.getName());
+                    request.setLanguage(getCodec().getName());
+                    request.setOntology(getOntology().getName());
                     request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
                     SendTasks sendTasks = new SendTasks();
                     sendTasks.setOperations(operations);

@@ -5,27 +5,38 @@ import jade.content.lang.sl.SLCodec;
 import jade.content.onto.Ontology;
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
-import jade.lang.acl.ACLMessage;
 import org.manufacture.Ontology.ManufactureOntology;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-public abstract class AbstractAgent extends Agent {
+public abstract class ResourceAgent extends Agent {
 
-    //to private
-    protected Codec codec = new SLCodec();
-    protected Ontology ontology = ManufactureOntology.getInstance();
+    private Codec codec = new SLCodec();
+    private Ontology ontology = ManufactureOntology.getInstance();
     private String type;
-    private String station;
-    //to private
-    protected DFAgentDescription dfd = new DFAgentDescription();
-    protected ServiceDescription sd = new ServiceDescription();
+    private final DFAgentDescription dfd = new DFAgentDescription();
+    private final ServiceDescription sd = new ServiceDescription();
+
+    public Codec getCodec() {
+        return codec;
+    }
+
+    public void setCodec(Codec codec) {
+        this.codec = codec;
+    }
+
+    public Ontology getOntology() {
+        return ontology;
+    }
+
+    public void setOntology(Ontology ontology) {
+        this.ontology = ontology;
+    }
 
     public String getType() {
         return type;
@@ -33,14 +44,6 @@ public abstract class AbstractAgent extends Agent {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public String getStation() {
-        return station;
-    }
-
-    public void setStation(String station) {
-        this.station = station;
     }
 
     @Override
@@ -78,19 +81,25 @@ public abstract class AbstractAgent extends Agent {
         }
     }
 
-    private void setFields() {
+    protected void setFields() {
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
             this.type = (String) args[0];
-            this.station = (String) args[1];
         } else {
             System.out.println("No arguments");
-            //doDelete();
+            doDelete();
         }
     }
 
     @Override
     protected void takeDown() {
         System.out.println("Agent " + getLocalName() + " terminating.");
+        if (!getLocalName().contains("Distributor")) {
+            try {
+                DFService.deregister(this);
+            } catch (FIPAException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -5,14 +5,9 @@ import jade.content.ContentElement;
 import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
-import jade.core.AID;
 import jade.util.leap.List;
-import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.SendTasks;
-import org.manufacture.Ontology.concepts.domain.Operation;
-import org.manufacture.Ontology.concepts.domain.OperationJournal;
-import org.manufacture.Ontology.concepts.domain.Resource;
-import org.manufacture.Ontology.concepts.domain.StationJournal;
+import org.manufacture.Ontology.concepts.domain.*;
 import org.manufacture.constants.Constants;
 import jade.core.behaviours.*;
 import jade.domain.DFService;
@@ -22,17 +17,29 @@ import jade.lang.acl.MessageTemplate;
 
 import java.util.Date;
 
-public class AgentManufacturer extends AbstractAgent {
+public class AgentManufacturer extends ResourceAgent {
 
     private boolean isWorking = false;
     private List operations;
     private boolean isDone = false;
-    private StationJournal stationJournal;
+    private String station;
+    private java.util.List<Tool> toolList;
 
     @Override
     protected void setup() {
         super.setup();
         addBehaviour(new GetOfferRequest());
+    }
+
+    protected void setFields() {
+        Object[] args = getArguments();
+        if (args != null && args.length > 0) {
+            setType((String) args[0]);
+            this.station = (String) args[1];
+        } else {
+            System.out.println("No arguments");
+            doDelete();
+        }
     }
 
     private class GetOfferRequest extends CyclicBehaviour {
@@ -91,7 +98,7 @@ public class AgentManufacturer extends AbstractAgent {
             if (isDone) {
                 reply.setPerformative(ACLMessage.INFORM);
                 // отчет
-                
+
                 send(reply);
                 isWorking = false;
                 isDone = false;
@@ -118,10 +125,10 @@ public class AgentManufacturer extends AbstractAgent {
                 protected void onWake() {
                     System.out.println("[" + getLocalName() +
                             "] выполняется " + operation.getName() + " " + operation.getMaterial().getName());
-                    createJournal();
+                    //createJournal();
                 }
 
-                private void createJournal() {
+               /* private void createJournal() {
                     Date endDateO = new Date();
                     Resource resource = new Resource();
                     resource.setName(getName());
@@ -135,18 +142,11 @@ public class AgentManufacturer extends AbstractAgent {
                     stationJournal.addOperationJournals(operationJournal);
                     //need
                     //operationJournal.setFailures();
-                }
+                }*/
             });
         }
         addBehaviour(seqBehaviour);
     }
 
-    @Override
-    protected void takeDown() {
-        try {
-            DFService.deregister(this);
-        } catch (FIPAException e) {
-            e.printStackTrace();
-        }
-    }
+
 }

@@ -16,7 +16,7 @@ import org.manufacture.constants.Constants;
 import java.sql.SQLException;
 import java.util.*;
 
-public class AgentDistributor extends AbstractAgent {
+public class AgentDistributor extends ResourceAgent {
 
     private java.util.List<AID> managerAgents;
     private List<AID> manufacturerAgents;
@@ -118,8 +118,8 @@ public class AgentDistributor extends AbstractAgent {
                     accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
                     SendOrder sendOrder = new SendOrder();
                     sendOrder.setOrder(order);
-                    accept.setLanguage(codec.getName());
-                    accept.setOntology(ontology.getName());
+                    accept.setLanguage(getCodec().getName());
+                    accept.setOntology(getOntology().getName());
                     try {
                         getContentManager().fillContent(accept, new Action(getAID(), sendOrder));
                     } catch (Codec.CodecException | OntologyException codecException) {
