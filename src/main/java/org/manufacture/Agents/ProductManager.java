@@ -6,6 +6,7 @@ import jade.domain.FIPANames;
 import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.SendTasks;
+import org.manufacture.Ontology.actions.actionsImpl.DefaultSendTasks;
 import org.manufacture.Ontology.concepts.domain.Operation;
 import org.manufacture.Ontology.concepts.domain.Station;
 import org.manufacture.constants.Constants;
@@ -116,8 +117,8 @@ public class ProductManager extends ResourceAgent {
             Concept action = ((Action) content).getAction();
             if (action instanceof SendOrder) {
                 SendOrder sendOrder = (SendOrder) action;
-                planName = sendOrder.getOrder().getPlan().getName();
-                productName = sendOrder.getOrder().getProduct().getName();
+                planName = sendOrder.getOrder().getExecutedByPlan().getName();
+                productName = sendOrder.getOrder().getExecutedByPlan().getName();
             }
         }
     }
@@ -161,7 +162,7 @@ public class ProductManager extends ResourceAgent {
                     request.setLanguage(getCodec().getName());
                     request.setOntology(getOntology().getName());
                     request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-                    SendTasks sendTasks = new SendTasks();
+                    SendTasks sendTasks = new DefaultSendTasks();
                     sendTasks.setOperations(operations);
 
                     try {

@@ -1,29 +1,19 @@
 package org.manufacture.Ontology.concepts.domain;
 
 
-import org.manufacture.Ontology.concepts.general.AbstractItem;
+import org.manufacture.Ontology.concepts.general.Item;
 
 /**
- * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Function
- *
- * @author OntologyBeanGenerator v4.1
- * @version 2021/03/9, 22:46:25
- */
-public class Function extends AbstractItem {
+* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Function
+* @author OntologyBeanGenerator v4.1
+* @version 2021/03/25, 22:27:12
+*/
+public interface Function extends Item {
 
-    private static final long serialVersionUID = -1311739020448369233L;
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#executedOnMaterial
+   */
+   public void setExecutedOnMaterial(Material value);
+   public Material getExecutedOnMaterial();
 
-    private String _internalInstanceName = null;
-
-    public Function() {
-        this._internalInstanceName = "";
-    }
-
-    public Function(String instance_name) {
-        this._internalInstanceName = instance_name;
-    }
-
-    public String toString() {
-        return _internalInstanceName;
-    }
 }

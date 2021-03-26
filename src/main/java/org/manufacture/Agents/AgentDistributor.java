@@ -10,7 +10,13 @@ import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetInitiator;
 import org.manufacture.Ontology.actions.SendOrder;
-import org.manufacture.Ontology.concepts.domain.*;
+import org.manufacture.Ontology.actions.actionsImpl.DefaultSendOrder;
+import org.manufacture.Ontology.concepts.domain.Order;
+import org.manufacture.Ontology.concepts.domain.Plan;
+import org.manufacture.Ontology.concepts.domain.Product;
+import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultOrder;
+import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultPlan;
+import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultProduct;
 import org.manufacture.constants.Constants;
 
 import java.sql.SQLException;
@@ -24,6 +30,7 @@ public class AgentDistributor extends ResourceAgent {
     private AID manager;
     private int replyCnt = 0;
     private Order order;
+    private List<AID> worker;
 
     @Override
     protected void setup() {
@@ -52,17 +59,17 @@ public class AgentDistributor extends ResourceAgent {
         String productName = (String) arguments[0];
         String planName = (String) arguments[1];
         String dueDate = (String) arguments[2];
-        order = new Order();
+        order = new DefaultOrder();
         //QueryExecutorService queryExecutor = QueryExecutor.getQueryExecutor();
         //Product product = queryExecutor.seekEntity("product", productName, Product.class);
         //Plan plan = queryExecutor.seekEntity("plan", planName, Plan.class);
         order.setName("Order1");
-        Product product = new Product();
+        Product product = new DefaultProduct();
         product.setName("Машина стиральная стандартная");
-        order.setProduct(product);
-        Plan plan = new Plan();
+        order.setFormedOnProduct(product);
+        Plan plan = new DefaultPlan();
         plan.setName("Стандартный");
-        order.setPlan(plan);
+        order.setExecutedByPlan(plan);
         order.setDueDate(dueDate);
     }
 
@@ -116,7 +123,7 @@ public class AgentDistributor extends ResourceAgent {
                 if (accept != null) {
                     System.out.println("Accepting proposal " + bestProposal + " from responder " + bestProposer.getLocalName());
                     accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
-                    SendOrder sendOrder = new SendOrder();
+                    SendOrder sendOrder = new DefaultSendOrder();
                     sendOrder.setOrder(order);
                     accept.setLanguage(getCodec().getName());
                     accept.setOntology(getOntology().getName());

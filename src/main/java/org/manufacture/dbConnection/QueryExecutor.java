@@ -2,6 +2,7 @@ package org.manufacture.dbConnection;
 
 import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.concepts.domain.*;
+import org.manufacture.Ontology.concepts.domain.domainImpl.*;
 
 import java.sql.*;
 import java.util.*;
@@ -42,17 +43,19 @@ public class QueryExecutor implements QueryExecutorService {
         System.out.println(resultSet);
         List<Resource> resources = new ArrayList<>();
         while (resultSet.next()) {
-            Resource agent = new Resource();
+            Resource agent = new DefaultResource();
             agent.setName(resultSet.getString("rname"));
             agent.setType(resultSet.getString("type"));
             //Optional<String> x = Optional.ofNullable(resultSet.getString("type")).if;
             //agent.setDescription(agents.getString("description")); упущенно в рамках примера
-            Station station = new Station();
+            Station station = new DefaultStation();
             station.setName(resultSet.getString("sname"));
             //station description упущенно в рамках примера
-            agent.setStation(station);
+            //agent.(station);
             resources.add(agent);
         }
+
+        //ВЕРНУТЬ OBJECT И ПОТОМ ИСКЛЮЧИТЬ ТУПО
         connection.close();
         return resources;
     }
@@ -71,18 +74,18 @@ public class QueryExecutor implements QueryExecutorService {
         ResultSet resultSet = getStations.executeQuery();
         Map<Station, Operation> stationOperationMap = new LinkedHashMap<>();
         while (resultSet.next()) {
-            Tool tool = new Tool();
+            Tool tool = new DefaultTool();
             tool.setName(resultSet.getString("t_name"));
-            Material material = new Material();
+            Material material = new DefaultMaterial();
             material.setName(resultSet.getString("m_name"));
-            Setup setup = new Setup();
+            Setup setup = new DefaultSetup();
             setup.setName(resultSet.getString("s2_name"));
-            Operation operation = new Operation();
+            Operation operation = new DefaultOperation();
             operation.setName(resultSet.getString("o_name"));
-            operation.setSetup(setup);
-            operation.setMaterial(material);
+            operation.setRequiresSetup(setup);
+            operation.setPerformedOverMaterial(material);
             operation.setDuration(resultSet.getString("duration"));
-            Station station = new Station();
+            Station station = new DefaultStation();
             station.setName(resultSet.getString("s_name"));
             stationOperationMap.put(station, operation);
         }

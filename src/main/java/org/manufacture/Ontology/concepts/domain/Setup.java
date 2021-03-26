@@ -1,39 +1,19 @@
 package org.manufacture.Ontology.concepts.domain;
 
 
-import org.manufacture.Ontology.concepts.general.AbstractItem;
+import org.manufacture.Ontology.concepts.general.Item;
 
 /**
- * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Setup
- *
- * @author OntologyBeanGenerator v4.1
- * @version 2021/03/9, 22:46:25
- */
-public class Setup extends AbstractItem {
+* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Setup
+* @author OntologyBeanGenerator v4.1
+* @version 2021/03/25, 22:27:12
+*/
+public interface Setup extends Item {
 
-    private static final long serialVersionUID = -1311739020448369233L;
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#requiresTool
+   */
+   public void setRequiresTool(Tool value);
+   public Tool getRequiresTool();
 
-    private String _internalInstanceName = null;
-
-    public Setup() {
-        this._internalInstanceName = "";
-    }
-
-    public Setup(String instance_name) {
-        this._internalInstanceName = instance_name;
-    }
-
-    public String toString() {
-        return _internalInstanceName;
-    }
-
-    private Tool tool;
-
-    public Tool getTool() {
-        return tool;
-    }
-
-    public void setTool(Tool tool) {
-        this.tool = tool;
-    }
 }

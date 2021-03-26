@@ -1,38 +1,25 @@
 package org.manufacture.Ontology.concepts.domain;
 
-import jade.util.leap.ArrayList;
+
 import jade.util.leap.Iterator;
 import jade.util.leap.List;
-import org.manufacture.Ontology.concepts.general.AbstractJournal;
+import org.manufacture.Ontology.concepts.general.Journal;
 
-public class StationJournal extends AbstractJournal {
-    /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#operationJournals
-     */
-    private List operationJournals = new ArrayList();
+/**
+* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#StationJournal
+* @author OntologyBeanGenerator v4.1
+* @version 2021/03/25, 22:27:12
+*/
+public interface StationJournal extends Journal {
 
-    public void addOperationJournals(OperationJournal elem) {
-        operationJournals.add(elem);
-    }
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasOperationJournals
+   */
+   public void addHasOperationJournals(OperationJournal elem);
+   public boolean removeHasOperationJournals(OperationJournal elem);
+   public void clearAllHasOperationJournals();
+   public Iterator getAllHasOperationJournals();
+   public List getHasOperationJournals();
+   public void setHasOperationJournals(List l);
 
-    public boolean removeOperationJournals(OperationJournal elem) {
-        boolean result = operationJournals.remove(elem);
-        return result;
-    }
-
-    public void clearAllOperationJournals() {
-        operationJournals.clear();
-    }
-
-    public Iterator getAllOperationJournals() {
-        return operationJournals.iterator();
-    }
-
-    public List getOperationJournals() {
-        return operationJournals;
-    }
-
-    public void setOperationJournals(List l) {
-        operationJournals = l;
-    }
 }

@@ -6,18 +6,12 @@ import jade.core.Runtime;
 import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
-import org.manufacture.API.QueryExecutorBuilder;
 import org.manufacture.API.QueryExecutorService;
-import org.manufacture.Ontology.concepts.domain.Operation;
 import org.manufacture.Ontology.concepts.domain.Resource;
-import org.manufacture.Ontology.concepts.domain.Station;
 import org.manufacture.dbConnection.QueryExecutor;
 
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class Main {
 
@@ -43,7 +37,7 @@ public class Main {
         List<Resource> resources = queryExecutor.seekAgents();
 
         resources.forEach(resource -> {
-            Object[] args = new Object[]{resource.getType(), resource.getStation().getName()};
+            Object[] args = new Object[]{resource.getType()};
             String className = "org.manufacture.Agents.";
             if (resource.getName().contains("Manufacturer") || resource.getName().contains("Verifier") || resource.getName().contains("Packer")) {
                 createAgent(manufactureContainer, resource.getName(), args, className + "AgentManufacturer");

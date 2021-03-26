@@ -1,27 +1,25 @@
-package org.manufacture.Ontology.concepts.general;
+package org.manufacture.Ontology.concepts.domain.domainImpl;
 
-import jade.content.Concept;
-import jade.util.leap.ArrayList;
-import jade.util.leap.Iterator;
-import jade.util.leap.List;
+
+import org.manufacture.Ontology.concepts.domain.Resource;
 
 /**
- * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#AbstractItem
+ * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Resource
  *
  * @author OntologyBeanGenerator v4.1
- * @version 2021/03/9, 22:46:25
+ * @version 2021/03/25, 22:27:12
  */
-public abstract class AbstractItem implements Concept {
+public class DefaultResource implements Resource {
 
-    private static final long serialVersionUID = -1311739020448369233L;
+    private static final long serialVersionUID = 5298226161551650755L;
 
     private String _internalInstanceName = null;
 
-    public AbstractItem() {
+    public DefaultResource() {
         this._internalInstanceName = "";
     }
 
-    public AbstractItem(String instance_name) {
+    public DefaultResource(String instance_name) {
         this._internalInstanceName = instance_name;
     }
 
@@ -53,6 +51,19 @@ public abstract class AbstractItem implements Concept {
 
     public String getName() {
         return this.name;
+    }
+
+    /**
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#type
+     */
+    private String type;
+
+    public void setType(String value) {
+        this.type = value;
+    }
+
+    public String getType() {
+        return this.type;
     }
 
 }

@@ -1,6 +1,13 @@
 package org.manufacture.Ontology.concepts.domain;
 
-import org.manufacture.Ontology.concepts.general.AbstractItem;
 
-public class Station extends AbstractItem {
+import org.manufacture.Ontology.concepts.general.Item;
+
+/**
+* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Station
+* @author OntologyBeanGenerator v4.1
+* @version 2021/03/25, 22:27:12
+*/
+public interface Station extends Item {
+
 }

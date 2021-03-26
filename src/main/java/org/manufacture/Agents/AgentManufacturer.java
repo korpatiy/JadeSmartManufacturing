@@ -6,14 +6,12 @@ import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
 import jade.util.leap.List;
-import org.manufacture.Ontology.actions.SendTasks;
-import org.manufacture.Ontology.concepts.domain.*;
-import org.manufacture.constants.Constants;
 import jade.core.behaviours.*;
-import jade.domain.DFService;
-import jade.domain.FIPAException;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import org.manufacture.Ontology.actions.SendTasks;
+import org.manufacture.Ontology.concepts.domain.Operation;
+import org.manufacture.Ontology.concepts.domain.Tool;
 
 import java.util.Date;
 
@@ -35,7 +33,7 @@ public class AgentManufacturer extends ResourceAgent {
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
             setType((String) args[0]);
-            this.station = (String) args[1];
+            //this.station = (String) args[1];
         } else {
             System.out.println("No arguments");
             doDelete();
@@ -124,7 +122,7 @@ public class AgentManufacturer extends ResourceAgent {
                 @Override
                 protected void onWake() {
                     System.out.println("[" + getLocalName() +
-                            "] выполняется " + operation.getName() + " " + operation.getMaterial().getName());
+                            "] выполняется " + operation.getName() + " " + operation.getPerformedOverMaterial().getName());
                     //createJournal();
                 }
 

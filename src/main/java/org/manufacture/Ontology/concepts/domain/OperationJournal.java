@@ -1,90 +1,46 @@
 package org.manufacture.Ontology.concepts.domain;
 
 
-import org.manufacture.Ontology.concepts.general.AbstractJournal;
-import jade.util.leap.ArrayList;
 import jade.util.leap.Iterator;
 import jade.util.leap.List;
+import org.manufacture.Ontology.ManufactureOntology;
+import org.manufacture.Ontology.concepts.general.Journal;
 
 /**
  * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#OperationJournal
  *
  * @author OntologyBeanGenerator v4.1
- * @version 2021/03/9, 22:46:25
+ * @version 2021/03/25, 22:27:12
  */
-public class OperationJournal extends AbstractJournal {
-
-    private static final long serialVersionUID = -1311739020448369233L;
-
-    private String _internalInstanceName = null;
-
-    public OperationJournal() {
-        this._internalInstanceName = "";
-    }
-
-    public OperationJournal(String instance_name) {
-        this._internalInstanceName = instance_name;
-    }
-
-    public String toString() {
-        return _internalInstanceName;
-    }
+public interface OperationJournal extends Journal {
 
     /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#failures
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#describesOperation
      */
-    private List failures = new ArrayList();
+    public void setDescribesOperation(Operation value);
 
-    public void addFailures(Failure elem) {
-        failures.add(elem);
-    }
-
-    public boolean removeFailures(Failure elem) {
-        boolean result = failures.remove(elem);
-        return result;
-    }
-
-    public void clearAllFailures() {
-        failures.clear();
-    }
-
-    public Iterator getAllFailures() {
-        return failures.iterator();
-    }
-
-    public List getFailures() {
-        return failures;
-    }
-
-    public void setFailures(List l) {
-        failures = l;
-    }
+    public Operation getDescribesOperation();
 
     /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#resource
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasFailures
      */
-    private Resource resource;
+    public void addHasFailures(Failure elem);
 
-    public void setResource(Resource value) {
-        this.resource = value;
-    }
+    public boolean removeHasFailures(Failure elem);
 
-    public Resource getResource() {
-        return this.resource;
-    }
+    public void clearAllHasFailures();
 
+    public Iterator getAllHasFailures();
+
+    public List getHasFailures();
+
+    public void setHasFailures(List l);
 
     /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#operation
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasResource
      */
-    private Operation operation;
+    public void setHasResource(Resource value);
 
-    public void setOperation(Operation value) {
-        this.operation = value;
-    }
-
-    public Operation getOperation() {
-        return this.operation;
-    }
+    public Resource getHasResource();
 
 }

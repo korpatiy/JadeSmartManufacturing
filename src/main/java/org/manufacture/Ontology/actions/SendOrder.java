@@ -1,21 +1,19 @@
 package org.manufacture.Ontology.actions;
 
-import jade.content.AgentAction;
+
 import org.manufacture.Ontology.concepts.domain.Order;
 
-public class SendOrder implements AgentAction {
+/**
+* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#SendOrder
+* @author OntologyBeanGenerator v4.1
+* @version 2021/03/25, 22:27:12
+*/
+public interface SendOrder extends jade.content.AgentAction {
 
-    /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#order
-     */
-    private Order order;
-
-    public void setOrder(Order value) {
-        this.order = value;
-    }
-
-    public Order getOrder() {
-        return this.order;
-    }
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#order
+   */
+   public void setOrder(Order value);
+   public Order getOrder();
 
 }
