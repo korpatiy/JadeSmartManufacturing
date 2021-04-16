@@ -3,6 +3,8 @@ package org.manufacture.dbConnection;
 import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.concepts.domain.*;
 import org.manufacture.Ontology.concepts.domain.domainImpl.*;
+import org.manufacture.Ontology.concepts.general.Resource;
+import org.manufacture.Ontology.concepts.general.generalmpl.DefaultResource;
 
 import java.sql.*;
 import java.util.*;
@@ -84,7 +86,7 @@ public class QueryExecutor implements QueryExecutorService {
             operation.setName(resultSet.getString("o_name"));
             operation.setRequiresSetup(setup);
             operation.setPerformedOverMaterial(material);
-            operation.setDuration(resultSet.getString("duration"));
+           // operation.setDuration(resultSet.getString("duration"));
             Station station = new DefaultStation();
             station.setName(resultSet.getString("s_name"));
             stationOperationMap.put(station, operation);

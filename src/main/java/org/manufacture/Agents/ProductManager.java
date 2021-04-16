@@ -1,5 +1,6 @@
 package org.manufacture.Agents;
 
+
 import jade.core.behaviours.*;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
@@ -117,8 +118,10 @@ public class ProductManager extends ResourceAgent {
             Concept action = ((Action) content).getAction();
             if (action instanceof SendOrder) {
                 SendOrder sendOrder = (SendOrder) action;
-                planName = sendOrder.getOrder().getExecutedByPlan().getName();
-                productName = sendOrder.getOrder().getExecutedByPlan().getName();
+
+                //todo поменять геттеры
+               // planName = sendOrder.getOrder().getExecutedByPlan().getName();
+               // productName = sendOrder.getOrder().getExecutedByPlan().getName();
             }
         }
     }
@@ -146,7 +149,7 @@ public class ProductManager extends ResourceAgent {
         @Override
         public void action() {
             switch (step) {
-                case 0 -> {
+                case 0:
                     try {
                         worker = findServices(manufacturerType).get(0);
                     } catch (FIPAException e) {
@@ -163,7 +166,7 @@ public class ProductManager extends ResourceAgent {
                     request.setOntology(getOntology().getName());
                     request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
                     SendTasks sendTasks = new DefaultSendTasks();
-                    sendTasks.setOperations(operations);
+                    sendTasks.setHasOperations(operations);
 
                     try {
                         getContentManager().fillContent(request, new Action(getAID(), sendTasks));
@@ -175,8 +178,8 @@ public class ProductManager extends ResourceAgent {
                             MessageTemplate.MatchInReplyTo(request.getReplyWith()));
                     send(request);
                     step = 1;
-                }
-                case 1 -> {
+
+                case 1:
                     ACLMessage firstReply = myAgent.receive(mt);
                     if (firstReply != null) {
                         if (firstReply.getPerformative() == ACLMessage.AGREE) {
@@ -191,8 +194,8 @@ public class ProductManager extends ResourceAgent {
                     } else {
                         block();
                     }
-                }
-                case 2 -> {
+
+                case 2:
                     ACLMessage secondReply = myAgent.blockingReceive(mt);
                     if (secondReply != null) {
                         if (secondReply.getPerformative() == ACLMessage.INFORM)
@@ -206,7 +209,6 @@ public class ProductManager extends ResourceAgent {
                     } else {
                         block();
                     }
-                }
             }
         }
 

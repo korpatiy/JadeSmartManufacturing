@@ -4,25 +4,25 @@ package org.manufacture.Ontology.actions.actionsImpl;
 import jade.util.leap.ArrayList;
 import jade.util.leap.Iterator;
 import jade.util.leap.List;
-import org.manufacture.Ontology.actions.SendManufactureJournals;
+import org.manufacture.Ontology.actions.SendReport;
 import org.manufacture.Ontology.concepts.domain.ManufactureJournal;
 
 /**
-* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#SendManufactureJournals
+* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#SendReport
 * @author OntologyBeanGenerator v4.1
-* @version 2021/03/25, 22:27:12
+* @version 2021/04/16, 20:40:39
 */
-public class DefaultSendManufactureJournals implements SendManufactureJournals {
+public class DefaultSendReport implements SendReport {
 
-  private static final long serialVersionUID = 5298226161551650755L;
+  private static final long serialVersionUID = 3647375170601921857L;
 
   private String _internalInstanceName = null;
 
-  public DefaultSendManufactureJournals() {
+  public DefaultSendReport() {
     this._internalInstanceName = "";
   }
 
-  public DefaultSendManufactureJournals(String instance_name) {
+  public DefaultSendReport(String instance_name) {
     this._internalInstanceName = instance_name;
   }
 

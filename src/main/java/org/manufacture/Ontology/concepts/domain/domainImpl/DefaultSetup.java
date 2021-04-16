@@ -1,69 +1,63 @@
 package org.manufacture.Ontology.concepts.domain.domainImpl;
 
+
 import org.manufacture.Ontology.concepts.domain.Setup;
 import org.manufacture.Ontology.concepts.domain.Tool;
 
 /**
- * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Setup
- *
- * @author OntologyBeanGenerator v4.1
- * @version 2021/03/25, 22:27:12
- */
+* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Setup
+* @author OntologyBeanGenerator v4.1
+* @version 2021/04/16, 20:40:39
+*/
 public class DefaultSetup implements Setup {
 
-    private static final long serialVersionUID = 5298226161551650755L;
+  private static final long serialVersionUID = 3647375170601921857L;
 
-    private String _internalInstanceName = null;
+  private String _internalInstanceName = null;
 
-    public DefaultSetup() {
-        this._internalInstanceName = "";
-    }
+  public DefaultSetup() {
+    this._internalInstanceName = "";
+  }
 
-    public DefaultSetup(String instance_name) {
-        this._internalInstanceName = instance_name;
-    }
+  public DefaultSetup(String instance_name) {
+    this._internalInstanceName = instance_name;
+  }
 
-    public String toString() {
-        return _internalInstanceName;
-    }
+  public String toString() {
+    return _internalInstanceName;
+  }
 
-    /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#description
-     */
-    private String description;
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#name
+   */
+   private String name;
+   public void setName(String value) { 
+    this.name=value;
+   }
+   public String getName() {
+     return this.name;
+   }
 
-    public void setDescription(String value) {
-        this.description = value;
-    }
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#requiresTool
+   */
+   private Tool requiresTool;
+   public void setRequiresTool(Tool value) { 
+    this.requiresTool=value;
+   }
+   public Tool getRequiresTool() {
+     return this.requiresTool;
+   }
 
-    public String getDescription() {
-        return this.description;
-    }
-
-    /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#name
-     */
-    private String name;
-
-    public void setName(String value) {
-        this.name = value;
-    }
-
-    public String getName() {
-        return this.name;
-    }
-
-    /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#requiresTool
-     */
-    private Tool requiresTool;
-
-    public void setRequiresTool(Tool value) {
-        this.requiresTool = value;
-    }
-
-    public Tool getRequiresTool() {
-        return this.requiresTool;
-    }
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#id
+   */
+   private int id;
+   public void setId(int value) { 
+    this.id=value;
+   }
+   public int getId() {
+     return this.id;
+   }
 
 }

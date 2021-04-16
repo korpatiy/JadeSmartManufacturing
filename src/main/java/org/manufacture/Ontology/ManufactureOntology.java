@@ -28,18 +28,19 @@ public class ManufactureOntology extends Ontology {
         return theInstance;
     }
 
-
     // VOCABULARY
-    public static final String SENDMANUFACTUREJOURNALS_HASMANUFACTUREJOURNALS = "hasManufactureJournals";
-    public static final String SENDMANUFACTUREJOURNALS = "SendManufactureJournals";
-    public static final String SENDTASKS_OPERATIONS = "operations";
-    public static final String SENDTASKS = "SendTasks";
-    public static final String SENDOPERATIONJOURNALS_OPERATIONJOURNAL = "operationJournal";
+    public static final String SENDTASKS_HASOPERATIONS="hasOperations";
+    public static final String SENDTASKS="SendTasks";
+    public static final String SENDOPERATIONJOURNALS_OPERATIONJOURNALS = "operationJournals";
     public static final String SENDOPERATIONJOURNALS = "SendOperationJournals";
+    public static final String SENDREPORT_HASMANUFACTUREJOURNALS = "hasManufactureJournals";
+    public static final String SENDREPORT = "SendReport";
     public static final String SENDORDER_ORDER = "order";
     public static final String SENDORDER = "SendOrder";
+    public static final String PLAN_ID = "id";
     public static final String PLAN = "Plan";
     public static final String RESOURCE_TYPE = "type";
+    public static final String RESOURCE_NAME = "name";
     public static final String RESOURCE = "Resource";
     public static final String JOURNAL_STATUS = "status";
     public static final String JOURNAL_STARTDATE = "startDate";
@@ -49,35 +50,40 @@ public class ManufactureOntology extends Ontology {
     public static final String ITEM_DESCRIPTION = "description";
     public static final String ITEM = "Item";
     public static final String ORDER_EXECUTEDBYPLAN = "executedByPlan";
-    public static final String ORDER_HASMANUFACTUREJOURNALS = "hasManufactureJournals";
     public static final String ORDER_DUEDATE = "dueDate";
+    public static final String ORDER_HASOPERATIONS="hasOperations";
     public static final String ORDER_FORMEDONPRODUCT = "formedOnProduct";
     public static final String ORDER_QUANTITY = "quantity";
     public static final String ORDER = "Order";
+    public static final String SETUP_ID = "id";
     public static final String SETUP_REQUIRESTOOL = "requiresTool";
+    public static final String SETUP_NAME = "name";
     public static final String SETUP = "Setup";
-    public static final String STATIONJOURNAL_HASOPERATIONJOURNALS = "hasOperationJournals";
-    public static final String STATIONJOURNAL = "StationJournal";
     public static final String FAILURE_STATUS = "status";
+    public static final String FAILURE_ID = "id";
     public static final String FAILURE_TYPE = "type";
     public static final String FAILURE_OCCURRENCEDATE = "occurrenceDate";
+    public static final String FAILURE_NAME = "name";
     public static final String FAILURE = "Failure";
-    public static final String MANUFACTUREJOURNAL_HASSTATIONJOURNALS = "hasStationJournals";
+    public static final String MANUFACTUREJOURNAL_HASOPERATIONJOURNALS = "hasOperationJournals";
     public static final String MANUFACTUREJOURNAL = "ManufactureJournal";
     public static final String PRODUCT_HASMATERIALS = "hasMaterials";
     public static final String PRODUCT = "Product";
     public static final String MATERIAL = "Material";
+    public static final String TOOL = "Tool";
     public static final String OPERATION_REQUIRESSETUP = "requiresSetup";
     public static final String OPERATION_PERFORMEDOVERMATERIAL = "performedOverMaterial";
     public static final String OPERATION_DURATION = "duration";
     public static final String OPERATION_HASFUNCTION = "hasFunction";
+    public static final String OPERATION_PERFOMEDONSTATION = "perfomedOnStation";
     public static final String OPERATION = "Operation";
-    public static final String TOOL = "Tool";
-    public static final String OPERATIONJOURNAL_HASRESOURCE = "hasResource";
     public static final String OPERATIONJOURNAL_HASFAILURES = "hasFailures";
     public static final String OPERATIONJOURNAL_DESCRIBESOPERATION = "describesOperation";
+    public static final String OPERATIONJOURNAL_HASRESOURCE = "hasResource";
     public static final String OPERATIONJOURNAL = "OperationJournal";
-    public static final String FUNCTION_EXECUTEDONMATERIAL = "executedOnMaterial";
+    public static final String FUNCTION_ID = "id";
+    public static final String FUNCTION_PERFORMEDOVERMATERIAL = "performedOverMaterial";
+    public static final String FUNCTION_NAME = "name";
     public static final String FUNCTION = "Function";
     public static final String STATION = "Station";
     public static final String PRODUCTIONRESOURCE_LOCATEDONSTATION = "locatedOnStation";
@@ -112,8 +118,6 @@ public class ManufactureOntology extends Ontology {
             add(manufactureJournalSchema, DefaultManufactureJournal.class);
             ConceptSchema failureSchema = new ConceptSchema(FAILURE);
             add(failureSchema, DefaultFailure.class);
-            ConceptSchema stationJournalSchema = new ConceptSchema(STATIONJOURNAL);
-            add(stationJournalSchema, DefaultStationJournal.class);
             ConceptSchema setupSchema = new ConceptSchema(SETUP);
             add(setupSchema, DefaultSetup.class);
             ConceptSchema orderSchema = new ConceptSchema(ORDER);
@@ -130,12 +134,12 @@ public class ManufactureOntology extends Ontology {
             // adding AgentAction(s)
             AgentActionSchema sendOrderSchema = new AgentActionSchema(SENDORDER);
             add(sendOrderSchema, DefaultSendOrder.class);
+            AgentActionSchema sendReportSchema = new AgentActionSchema(SENDREPORT);
+            add(sendReportSchema, DefaultSendReport.class);
             AgentActionSchema sendOperationJournalsSchema = new AgentActionSchema(SENDOPERATIONJOURNALS);
             add(sendOperationJournalsSchema, DefaultSendOperationJournals.class);
             AgentActionSchema sendTasksSchema = new AgentActionSchema(SENDTASKS);
             add(sendTasksSchema, DefaultSendTasks.class);
-            AgentActionSchema sendManufactureJournalsSchema = new AgentActionSchema(SENDMANUFACTUREJOURNALS);
-            add(sendManufactureJournalsSchema, DefaultSendManufactureJournals.class);
 
             // adding AID(s)
 
@@ -145,56 +149,56 @@ public class ManufactureOntology extends Ontology {
             // adding fields
             productionResourceSchema.add(PRODUCTIONRESOURCE_USETOOLS, toolSchema, 0, ObjectSchema.UNLIMITED);
             productionResourceSchema.add(PRODUCTIONRESOURCE_LOCATEDONSTATION, stationSchema, ObjectSchema.OPTIONAL);
-            functionSchema.add(FUNCTION_EXECUTEDONMATERIAL, materialSchema, ObjectSchema.OPTIONAL);
+            functionSchema.add(FUNCTION_NAME, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
+            functionSchema.add(FUNCTION_PERFORMEDOVERMATERIAL, materialSchema, ObjectSchema.OPTIONAL);
+            functionSchema.add(FUNCTION_ID, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
+            operationJournalSchema.add(OPERATIONJOURNAL_HASRESOURCE, resourceSchema, ObjectSchema.OPTIONAL);
             operationJournalSchema.add(OPERATIONJOURNAL_DESCRIBESOPERATION, operationSchema, ObjectSchema.OPTIONAL);
             operationJournalSchema.add(OPERATIONJOURNAL_HASFAILURES, failureSchema, 0, ObjectSchema.UNLIMITED);
-            operationJournalSchema.add(OPERATIONJOURNAL_HASRESOURCE, resourceSchema, 0, ObjectSchema.UNLIMITED);
-            operationSchema.add(OPERATION_HASFUNCTION, functionSchema, 0, ObjectSchema.UNLIMITED);
-            operationSchema.add(OPERATION_DURATION, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
+            operationSchema.add(OPERATION_PERFOMEDONSTATION, stationSchema, ObjectSchema.OPTIONAL);
+            operationSchema.add(OPERATION_HASFUNCTION, functionSchema, ObjectSchema.OPTIONAL);
+            operationSchema.add(OPERATION_DURATION, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_PERFORMEDOVERMATERIAL, materialSchema, ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_REQUIRESSETUP, setupSchema, ObjectSchema.OPTIONAL);
-            productSchema.add(PRODUCT_HASMATERIALS, materialSchema, 0, ObjectSchema.UNLIMITED);
-            manufactureJournalSchema.add(MANUFACTUREJOURNAL_HASSTATIONJOURNALS, stationJournalSchema, 0, ObjectSchema.UNLIMITED);
-            failureSchema.add(FAILURE_OCCURRENCEDATE, (TermSchema) getSchema(BasicOntology.DATE), ObjectSchema.OPTIONAL);
+            productSchema.add(PRODUCT_HASMATERIALS, materialSchema, 1, ObjectSchema.UNLIMITED);
+            manufactureJournalSchema.add(MANUFACTUREJOURNAL_HASOPERATIONJOURNALS, operationJournalSchema, 0, ObjectSchema.UNLIMITED);
+            failureSchema.add(FAILURE_NAME, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
+            failureSchema.add(FAILURE_OCCURRENCEDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             failureSchema.add(FAILURE_TYPE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
-            failureSchema.add(FAILURE_STATUS, (TermSchema) getSchema(BasicOntology.STRING), 0, ObjectSchema.UNLIMITED);
-            stationJournalSchema.add(STATIONJOURNAL_HASOPERATIONJOURNALS, operationJournalSchema, 0, ObjectSchema.UNLIMITED);
+            failureSchema.add(FAILURE_ID, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
+            failureSchema.add(FAILURE_STATUS, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
+            setupSchema.add(SETUP_NAME, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             setupSchema.add(SETUP_REQUIRESTOOL, toolSchema, ObjectSchema.OPTIONAL);
+            setupSchema.add(SETUP_ID, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_QUANTITY, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
+            orderSchema.add(ORDER_HASOPERATIONS, operationSchema, 0, ObjectSchema.UNLIMITED);
             orderSchema.add(ORDER_FORMEDONPRODUCT, productSchema, ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_DUEDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
-            orderSchema.add(ORDER_HASMANUFACTUREJOURNALS, manufactureJournalSchema, 0, ObjectSchema.UNLIMITED);
             orderSchema.add(ORDER_EXECUTEDBYPLAN, planSchema, ObjectSchema.OPTIONAL);
             itemSchema.add(ITEM_DESCRIPTION, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             itemSchema.add(ITEM_NAME, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             journalSchema.add(JOURNAL_ENDDATE, (TermSchema) getSchema(BasicOntology.DATE), ObjectSchema.OPTIONAL);
             journalSchema.add(JOURNAL_STARTDATE, (TermSchema) getSchema(BasicOntology.DATE), ObjectSchema.OPTIONAL);
-            journalSchema.add(JOURNAL_STATUS, (TermSchema) getSchema(BasicOntology.STRING), 0, ObjectSchema.UNLIMITED);
+            journalSchema.add(JOURNAL_STATUS, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
+            resourceSchema.add(RESOURCE_NAME, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             resourceSchema.add(RESOURCE_TYPE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
+            planSchema.add(PLAN_ID, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
             sendOrderSchema.add(SENDORDER_ORDER, orderSchema, ObjectSchema.OPTIONAL);
-            sendOperationJournalsSchema.add(SENDOPERATIONJOURNALS_OPERATIONJOURNAL, operationJournalSchema, 0, ObjectSchema.UNLIMITED);
-            sendTasksSchema.add(SENDTASKS_OPERATIONS, operationSchema, 0, ObjectSchema.UNLIMITED);
-            sendManufactureJournalsSchema.add(SENDMANUFACTUREJOURNALS_HASMANUFACTUREJOURNALS, manufactureJournalSchema, 0, ObjectSchema.UNLIMITED);
+            sendReportSchema.add(SENDREPORT_HASMANUFACTUREJOURNALS, manufactureJournalSchema, 0, ObjectSchema.UNLIMITED);
+            sendOperationJournalsSchema.add(SENDOPERATIONJOURNALS_OPERATIONJOURNALS, operationJournalSchema, 0, ObjectSchema.UNLIMITED);
+            sendTasksSchema.add(SENDTASKS_HASOPERATIONS, operationSchema, 0, ObjectSchema.UNLIMITED);
 
             // adding name mappings
 
             // adding inheritance
             productionResourceSchema.addSuperSchema(resourceSchema);
             stationSchema.addSuperSchema(itemSchema);
-            functionSchema.addSuperSchema(itemSchema);
             operationJournalSchema.addSuperSchema(journalSchema);
-            toolSchema.addSuperSchema(itemSchema);
             operationSchema.addSuperSchema(itemSchema);
+            toolSchema.addSuperSchema(itemSchema);
             materialSchema.addSuperSchema(itemSchema);
             productSchema.addSuperSchema(itemSchema);
             manufactureJournalSchema.addSuperSchema(journalSchema);
-            failureSchema.addSuperSchema(itemSchema);
-            stationJournalSchema.addSuperSchema(journalSchema);
-            setupSchema.addSuperSchema(itemSchema);
-            orderSchema.addSuperSchema(itemSchema);
-            resourceSchema.addSuperSchema(itemSchema);
-            planSchema.addSuperSchema(itemSchema);
-
         } catch (Exception e) {
             e.printStackTrace();
         }

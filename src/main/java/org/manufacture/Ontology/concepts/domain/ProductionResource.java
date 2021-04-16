@@ -3,11 +3,12 @@ package org.manufacture.Ontology.concepts.domain;
 
 import jade.util.leap.Iterator;
 import jade.util.leap.List;
+import org.manufacture.Ontology.concepts.general.Resource;
 
 /**
 * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#ProductionResource
 * @author OntologyBeanGenerator v4.1
-* @version 2021/03/25, 22:27:12
+* @version 2021/04/16, 20:40:39
 */
 public interface ProductionResource extends Resource {
 

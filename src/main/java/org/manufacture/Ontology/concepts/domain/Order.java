@@ -3,14 +3,13 @@ package org.manufacture.Ontology.concepts.domain;
 
 import jade.util.leap.Iterator;
 import jade.util.leap.List;
-import org.manufacture.Ontology.concepts.general.Item;
 
 /**
 * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Order
 * @author OntologyBeanGenerator v4.1
-* @version 2021/03/25, 22:27:12
+* @version 2021/04/16, 20:40:39
 */
-public interface Order extends Item {
+public interface Order extends jade.content.Concept {
 
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#quantity
@@ -31,19 +30,19 @@ public interface Order extends Item {
    public String getDueDate();
 
    /**
-   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasManufactureJournals
-   */
-   public void addHasManufactureJournals(ManufactureJournal elem);
-   public boolean removeHasManufactureJournals(ManufactureJournal elem);
-   public void clearAllHasManufactureJournals();
-   public Iterator getAllHasManufactureJournals();
-   public List getHasManufactureJournals();
-   public void setHasManufactureJournals(List l);
-
-   /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#executedByPlan
    */
    public void setExecutedByPlan(Plan value);
    public Plan getExecutedByPlan();
+
+   /**
+    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasOperations
+    */
+   public void addHasOperations(Operation elem);
+   public boolean removeHasOperations(Operation elem);
+   public void clearAllHasOperations();
+   public Iterator getAllHasOperations();
+   public List getHasOperations();
+   public void setHasOperations(List l);
 
 }

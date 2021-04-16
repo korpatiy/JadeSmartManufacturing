@@ -11,11 +11,11 @@ import org.manufacture.Ontology.concepts.domain.Operation;
  * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#SendTasks
  *
  * @author OntologyBeanGenerator v4.1
- * @version 2021/03/25, 22:27:12
+ * @version 2021/04/16, 20:40:39
  */
 public class DefaultSendTasks implements SendTasks {
 
-    private static final long serialVersionUID = 5298226161551650755L;
+    private static final long serialVersionUID = 84152853867242224L;
 
     private String _internalInstanceName = null;
 
@@ -32,33 +32,32 @@ public class DefaultSendTasks implements SendTasks {
     }
 
     /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#operations
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasOperations
      */
-    private List operations = new ArrayList();
+    private List hasOperations = new ArrayList();
 
-    public void addOperations(Operation elem) {
-        operations.add(elem);
+    public void addHasOperations(Operation elem) {
+        hasOperations.add(elem);
     }
 
-    public boolean removeOperations(Operation elem) {
-        boolean result = operations.remove(elem);
+    public boolean removeHasOperations(Operation elem) {
+        boolean result = hasOperations.remove(elem);
         return result;
     }
 
-    public void clearAllOperations() {
-        operations.clear();
+    public void clearAllHasOperations() {
+        hasOperations.clear();
     }
 
-    public Iterator getAllOperations() {
-        return operations.iterator();
+    public Iterator getAllHasOperations() {
+        return hasOperations.iterator();
     }
 
-    public List getOperations() {
-        return operations;
+    public List getHasOperations() {
+        return hasOperations;
     }
 
-    public void setOperations(List l) {
-        operations = l;
+    public void setHasOperations(List l) {
+        hasOperations = l;
     }
-
 }

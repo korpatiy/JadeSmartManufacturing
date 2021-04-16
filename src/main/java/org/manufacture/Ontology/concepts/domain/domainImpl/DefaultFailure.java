@@ -1,19 +1,16 @@
 package org.manufacture.Ontology.concepts.domain.domainImpl;
 
 
-import jade.util.leap.ArrayList;
-import jade.util.leap.Iterator;
-import jade.util.leap.List;
 import org.manufacture.Ontology.concepts.domain.Failure;
 
 /**
 * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Failure
 * @author OntologyBeanGenerator v4.1
-* @version 2021/03/25, 22:27:12
+* @version 2021/04/16, 20:40:39
 */
 public class DefaultFailure implements Failure {
 
-  private static final long serialVersionUID = 5298226161551650755L;
+  private static final long serialVersionUID = 3647375170601921857L;
 
   private String _internalInstanceName = null;
 
@@ -28,17 +25,6 @@ public class DefaultFailure implements Failure {
   public String toString() {
     return _internalInstanceName;
   }
-
-   /**
-   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#description
-   */
-   private String description;
-   public void setDescription(String value) { 
-    this.description=value;
-   }
-   public String getDescription() {
-     return this.description;
-   }
 
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#name
@@ -74,21 +60,25 @@ public class DefaultFailure implements Failure {
    }
 
    /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#id
+   */
+   private int id;
+   public void setId(int value) { 
+    this.id=value;
+   }
+   public int getId() {
+     return this.id;
+   }
+
+   /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#status
    */
-   private List status = new ArrayList();
-   public void addStatus(String elem) { 
-     status.add(elem);
+   private String status;
+   public void setStatus(String value) { 
+    this.status=value;
    }
-   public boolean removeStatus(String elem) {
-     boolean result = status.remove(elem);
-     return result;
+   public String getStatus() {
+     return this.status;
    }
-   public void clearAllStatus() {
-     status.clear();
-   }
-   public Iterator getAllStatus() {return status.iterator(); }
-   public List getStatus() {return status; }
-   public void setStatus(List l) {status = l; }
 
 }

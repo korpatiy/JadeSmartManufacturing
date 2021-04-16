@@ -78,7 +78,7 @@ public class AgentManufacturer extends ResourceAgent {
             Concept action = ((Action) content).getAction();
             if (action instanceof SendTasks) {
                 SendTasks sendTasks = (SendTasks) action;
-                operations = sendTasks.getOperations();
+                operations = sendTasks.getHasOperations();
             }
         }
     }
@@ -118,7 +118,7 @@ public class AgentManufacturer extends ResourceAgent {
             Operation operation = (Operation) operations.get(i);
             //Положение Setup
             Date startDateO = new Date();
-            seqBehaviour.addSubBehaviour(new WakerBehaviour(this, Long.parseLong(operation.getDuration())) {
+            seqBehaviour.addSubBehaviour(new WakerBehaviour(this, operation.getDuration()) {
                 @Override
                 protected void onWake() {
                     System.out.println("[" + getLocalName() +

@@ -5,7 +5,7 @@ import jade.util.leap.ArrayList;
 import jade.util.leap.Iterator;
 import jade.util.leap.List;
 import org.manufacture.Ontology.concepts.domain.ManufactureJournal;
-import org.manufacture.Ontology.concepts.domain.StationJournal;
+import org.manufacture.Ontology.concepts.domain.OperationJournal;
 
 import java.util.Date;
 
@@ -13,11 +13,11 @@ import java.util.Date;
  * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#ManufactureJournal
  *
  * @author OntologyBeanGenerator v4.1
- * @version 2021/03/25, 22:27:12
+ * @version 2021/04/16, 20:40:39
  */
 public class DefaultManufactureJournal implements ManufactureJournal {
 
-    private static final long serialVersionUID = 5298226161551650755L;
+    private static final long serialVersionUID = 3647375170601921857L;
 
     private String _internalInstanceName = null;
 
@@ -47,33 +47,33 @@ public class DefaultManufactureJournal implements ManufactureJournal {
     }
 
     /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasStationJournals
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasOperationJournals
      */
-    private List hasStationJournals = new ArrayList();
+    private List hasOperationJournals = new ArrayList();
 
-    public void addHasStationJournals(StationJournal elem) {
-        hasStationJournals.add(elem);
+    public void addHasOperationJournals(OperationJournal elem) {
+        hasOperationJournals.add(elem);
     }
 
-    public boolean removeHasStationJournals(StationJournal elem) {
-        boolean result = hasStationJournals.remove(elem);
+    public boolean removeHasOperationJournals(OperationJournal elem) {
+        boolean result = hasOperationJournals.remove(elem);
         return result;
     }
 
-    public void clearAllHasStationJournals() {
-        hasStationJournals.clear();
+    public void clearAllHasOperationJournals() {
+        hasOperationJournals.clear();
     }
 
-    public Iterator getAllHasStationJournals() {
-        return hasStationJournals.iterator();
+    public Iterator getAllHasOperationJournals() {
+        return hasOperationJournals.iterator();
     }
 
-    public List getHasStationJournals() {
-        return hasStationJournals;
+    public List getHasOperationJournals() {
+        return hasOperationJournals;
     }
 
-    public void setHasStationJournals(List l) {
-        hasStationJournals = l;
+    public void setHasOperationJournals(List l) {
+        hasOperationJournals = l;
     }
 
     /**
@@ -92,31 +92,14 @@ public class DefaultManufactureJournal implements ManufactureJournal {
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#status
      */
-    private List status = new ArrayList();
+    private String status;
 
-    public void addStatus(String elem) {
-        status.add(elem);
+    public void setStatus(String value) {
+        this.status = value;
     }
 
-    public boolean removeStatus(String elem) {
-        boolean result = status.remove(elem);
-        return result;
-    }
-
-    public void clearAllStatus() {
-        status.clear();
-    }
-
-    public Iterator getAllStatus() {
-        return status.iterator();
-    }
-
-    public List getStatus() {
-        return status;
-    }
-
-    public void setStatus(List l) {
-        status = l;
+    public String getStatus() {
+        return this.status;
     }
 
 }

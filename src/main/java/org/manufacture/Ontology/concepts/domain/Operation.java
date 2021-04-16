@@ -6,9 +6,15 @@ import org.manufacture.Ontology.concepts.general.Item;
 /**
 * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Operation
 * @author OntologyBeanGenerator v4.1
-* @version 2021/03/25, 22:27:12
+* @version 2021/04/16, 20:40:39
 */
 public interface Operation extends Item {
+
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#perfomedOnStation
+   */
+   public void setPerfomedOnStation(Station value);
+   public Station getPerfomedOnStation();
 
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasFunction
@@ -19,8 +25,8 @@ public interface Operation extends Item {
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#duration
    */
-   public void setDuration(String value);
-   public String getDuration();
+   public void setDuration(int value);
+   public int getDuration();
 
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#performedOverMaterial

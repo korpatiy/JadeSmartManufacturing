@@ -8,57 +8,44 @@ import org.manufacture.Ontology.actions.SendOperationJournals;
 import org.manufacture.Ontology.concepts.domain.OperationJournal;
 
 /**
- * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#SendOperationJournals
- *
- * @author OntologyBeanGenerator v4.1
- * @version 2021/03/25, 22:27:12
- */
+* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#SendOperationJournals
+* @author OntologyBeanGenerator v4.1
+* @version 2021/04/16, 20:40:39
+*/
 public class DefaultSendOperationJournals implements SendOperationJournals {
 
-    private static final long serialVersionUID = 5298226161551650755L;
+  private static final long serialVersionUID = 3647375170601921857L;
 
-    private String _internalInstanceName = null;
+  private String _internalInstanceName = null;
 
-    public DefaultSendOperationJournals() {
-        this._internalInstanceName = "";
-    }
+  public DefaultSendOperationJournals() {
+    this._internalInstanceName = "";
+  }
 
-    public DefaultSendOperationJournals(String instance_name) {
-        this._internalInstanceName = instance_name;
-    }
+  public DefaultSendOperationJournals(String instance_name) {
+    this._internalInstanceName = instance_name;
+  }
 
-    public String toString() {
-        return _internalInstanceName;
-    }
+  public String toString() {
+    return _internalInstanceName;
+  }
 
-    /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#operationJournal
-     */
-    private List operationJournal = new ArrayList();
-
-    public void addOperationJournal(OperationJournal elem) {
-        operationJournal.add(elem);
-    }
-
-    public boolean removeOperationJournal(OperationJournal elem) {
-        boolean result = operationJournal.remove(elem);
-        return result;
-    }
-
-    public void clearAllOperationJournal() {
-        operationJournal.clear();
-    }
-
-    public Iterator getAllOperationJournal() {
-        return operationJournal.iterator();
-    }
-
-    public List getOperationJournal() {
-        return operationJournal;
-    }
-
-    public void setOperationJournal(List l) {
-        operationJournal = l;
-    }
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#operationJournals
+   */
+   private List operationJournals = new ArrayList();
+   public void addOperationJournals(OperationJournal elem) {
+     operationJournals.add(elem);
+   }
+   public boolean removeOperationJournals(OperationJournal elem) {
+     boolean result = operationJournals.remove(elem);
+     return result;
+   }
+   public void clearAllOperationJournals() {
+     operationJournals.clear();
+   }
+   public Iterator getAllOperationJournals() {return operationJournals.iterator(); }
+   public List getOperationJournals() {return operationJournals; }
+   public void setOperationJournals(List l) {operationJournals = l; }
 
 }

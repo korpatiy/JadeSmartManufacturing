@@ -1,41 +1,30 @@
 package org.manufacture.Ontology.concepts.general.generalmpl;
 
 
-import org.manufacture.Ontology.concepts.general.Item;
+import org.manufacture.Ontology.concepts.general.Resource;
 
 /**
-* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Item
+* Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#Resource
 * @author OntologyBeanGenerator v4.1
 * @version 2021/04/16, 20:40:39
 */
-public class DefaultItem implements Item {
+public class DefaultResource implements Resource {
 
   private static final long serialVersionUID = 3647375170601921857L;
 
   private String _internalInstanceName = null;
 
-  public DefaultItem() {
+  public DefaultResource() {
     this._internalInstanceName = "";
   }
 
-  public DefaultItem(String instance_name) {
+  public DefaultResource(String instance_name) {
     this._internalInstanceName = instance_name;
   }
 
   public String toString() {
     return _internalInstanceName;
   }
-
-   /**
-   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#description
-   */
-   private String description;
-   public void setDescription(String value) { 
-    this.description=value;
-   }
-   public String getDescription() {
-     return this.description;
-   }
 
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#name
@@ -46,6 +35,17 @@ public class DefaultItem implements Item {
    }
    public String getName() {
      return this.name;
+   }
+
+   /**
+   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#type
+   */
+   private String type;
+   public void setType(String value) { 
+    this.type=value;
+   }
+   public String getType() {
+     return this.type;
    }
 
 }

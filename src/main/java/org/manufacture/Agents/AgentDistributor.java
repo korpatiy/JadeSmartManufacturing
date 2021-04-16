@@ -4,6 +4,7 @@ import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
+import jade.core.Agent;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
@@ -20,7 +21,9 @@ import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultProduct;
 import org.manufacture.constants.Constants;
 
 import java.sql.SQLException;
-import java.util.*;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Vector;
 
 public class AgentDistributor extends ResourceAgent {
 
@@ -28,7 +31,7 @@ public class AgentDistributor extends ResourceAgent {
     private List<AID> manufacturerAgents;
     private MessageTemplate mt;
     private AID manager;
-    private int replyCnt = 0;
+    //private int replyCnt = 0;
     private Order order;
     private List<AID> worker;
 
@@ -45,11 +48,11 @@ public class AgentDistributor extends ResourceAgent {
         } catch (FIPAException e) {
             e.printStackTrace();
         }
-        /*try {
-            Thread.sleep(40000);
+        try {
+            Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }*/
+        }
         orderHandler();
         //addBehaviour(new SendingOrder());
     }
@@ -63,12 +66,10 @@ public class AgentDistributor extends ResourceAgent {
         //QueryExecutorService queryExecutor = QueryExecutor.getQueryExecutor();
         //Product product = queryExecutor.seekEntity("product", productName, Product.class);
         //Plan plan = queryExecutor.seekEntity("plan", planName, Plan.class);
-        order.setName("Order1");
         Product product = new DefaultProduct();
         product.setName("Машина стиральная стандартная");
         order.setFormedOnProduct(product);
         Plan plan = new DefaultPlan();
-        plan.setName("Стандартный");
         order.setExecutedByPlan(plan);
         order.setDueDate(dueDate);
     }

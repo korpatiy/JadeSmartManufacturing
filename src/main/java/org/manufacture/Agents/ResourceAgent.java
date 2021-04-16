@@ -52,6 +52,7 @@ public abstract class ResourceAgent extends Agent {
             setFields();
             registerService();
         }
+
         System.out.println("Agent " + getLocalName() + " is ready.");
         getContentManager().registerLanguage(codec);
         getContentManager().registerOntology(ontology);

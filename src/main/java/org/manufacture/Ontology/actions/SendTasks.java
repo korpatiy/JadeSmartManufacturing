@@ -8,18 +8,17 @@ import org.manufacture.Ontology.concepts.domain.Operation;
 /**
 * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#SendTasks
 * @author OntologyBeanGenerator v4.1
-* @version 2021/03/25, 22:27:12
+* @version 2021/04/16, 20:40:39
 */
 public interface SendTasks extends jade.content.AgentAction {
 
    /**
-   * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#operations
-   */
-   public void addOperations(Operation elem);
-   public boolean removeOperations(Operation elem);
-   public void clearAllOperations();
-   public Iterator getAllOperations();
-   public List getOperations();
-   public void setOperations(List l);
-
+    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasOperations
+    */
+   public void addHasOperations(Operation elem);
+   public boolean removeHasOperations(Operation elem);
+   public void clearAllHasOperations();
+   public Iterator getAllHasOperations();
+   public List getHasOperations();
+   public void setHasOperations(List l);
 }

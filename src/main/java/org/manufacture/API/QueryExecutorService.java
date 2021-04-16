@@ -1,8 +1,8 @@
 package org.manufacture.API;
 
 import org.manufacture.Ontology.concepts.domain.Operation;
-import org.manufacture.Ontology.concepts.domain.Resource;
 import org.manufacture.Ontology.concepts.domain.Station;
+import org.manufacture.Ontology.concepts.general.Resource;
 
 import java.sql.SQLException;
 import java.util.List;

@@ -7,7 +7,7 @@ import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 import org.manufacture.API.QueryExecutorService;
-import org.manufacture.Ontology.concepts.domain.Resource;
+import org.manufacture.Ontology.concepts.general.Resource;
 import org.manufacture.dbConnection.QueryExecutor;
 
 import java.sql.SQLException;
