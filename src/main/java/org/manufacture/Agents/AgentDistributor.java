@@ -10,6 +10,7 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetInitiator;
+import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.actionsImpl.DefaultSendOrder;
 import org.manufacture.Ontology.concepts.domain.Order;
@@ -19,6 +20,7 @@ import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultOrder;
 import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultPlan;
 import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultProduct;
 import org.manufacture.constants.Constants;
+import org.manufacture.dbConnection.QueryExecutor;
 
 import java.sql.SQLException;
 import java.util.Enumeration;
@@ -31,7 +33,6 @@ public class AgentDistributor extends ResourceAgent {
     private List<AID> manufacturerAgents;
     private MessageTemplate mt;
     private AID manager;
-    //private int replyCnt = 0;
     private Order order;
     private List<AID> worker;
 
@@ -54,24 +55,23 @@ public class AgentDistributor extends ResourceAgent {
             e.printStackTrace();
         }
         orderHandler();
-        //addBehaviour(new SendingOrder());
     }
 
     private void createOrder() throws SQLException {
         Object[] arguments = getArguments();
         String productName = (String) arguments[0];
-        String planName = (String) arguments[1];
-        String dueDate = (String) arguments[2];
+        String dueDate = String.valueOf(arguments[1]);
+        int qty = (int) arguments[2];
         order = new DefaultOrder();
-        //QueryExecutorService queryExecutor = QueryExecutor.getQueryExecutor();
-        //Product product = queryExecutor.seekEntity("product", productName, Product.class);
-        //Plan plan = queryExecutor.seekEntity("plan", planName, Plan.class);
+        QueryExecutorService queryExecutor = QueryExecutor.getQueryExecutor();
+        Plan plan = queryExecutor.seekPlan(productName);
+
         Product product = new DefaultProduct();
-        product.setName("Машина стиральная стандартная");
+        product.setName(productName);
         order.setFormedOnProduct(product);
-        Plan plan = new DefaultPlan();
-        order.setExecutedByPlan(plan);
+        order.setQuantity(qty);
         order.setDueDate(dueDate);
+        order.setExecutedByPlan(plan);
     }
 
     private void orderHandler() {
@@ -82,17 +82,18 @@ public class AgentDistributor extends ResourceAgent {
         msg.setConversationId(Constants.DISTRIBUTOR_MANAGER);
         msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
         msg.setReplyWith("msg" + System.currentTimeMillis());
-        msg.setContent("Машинка стиральная");
         addBehaviour(new ContractNetInitiator(this, msg) {
 
             @Override
             protected void handlePropose(ACLMessage propose, Vector acceptances) {
-                System.out.println("Get propose from " + propose.getSender().getLocalName());
+                System.out.println("[" + getLocalName() +
+                        "] Принял ответ от " + propose.getSender().getLocalName());
             }
 
             @Override
             protected void handleRefuse(ACLMessage refuse) {
-                System.out.println("Get refuse from " + refuse.getSender().getLocalName());
+                System.out.println("[" + getLocalName() +
+                        "] Принял отказ от " + refuse.getSender().getLocalName());
             }
 
             @Override
@@ -122,8 +123,10 @@ public class AgentDistributor extends ResourceAgent {
                     }
                 }
                 if (accept != null) {
-                    System.out.println("Accepting proposal " + bestProposal + " from responder " + bestProposer.getLocalName());
+                    System.out.println("[" + getLocalName() +
+                            "] Принял предложение " + bestProposal + " от " + bestProposer.getLocalName());
                     accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                    // Формирование сообщения с использованием jade.content.ContentManager
                     SendOrder sendOrder = new DefaultSendOrder();
                     sendOrder.setOrder(order);
                     accept.setLanguage(getCodec().getName());
@@ -138,7 +141,8 @@ public class AgentDistributor extends ResourceAgent {
 
             @Override
             protected void handleInform(ACLMessage inform) {
-                System.out.println("Принял отчет от " + inform.getSender().getLocalName());
+                System.out.println("[" + getLocalName() +
+                        "] Принял отчет от " + inform.getSender().getLocalName());
                 doDelete();
             }
         });

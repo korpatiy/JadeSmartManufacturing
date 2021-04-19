@@ -52,16 +52,16 @@ public class AgentManufacturer extends ResourceAgent {
                     reply.setPerformative(ACLMessage.AGREE);
                     System.out.println("[" + getLocalName() +
                             "] принял операции");
+                    send(reply);
                     processContent(msg);
-                    isWorking = true;
                     startWorking();
                     addBehaviour(new SendInform(msg.createReply()));
                 } else {
                     reply.setPerformative(ACLMessage.REFUSE);
                     System.out.println("[" + getLocalName() +
                             "] отказ");
+                    send(reply);
                 }
-                send(reply);
             } else {
                 block();
             }
@@ -106,6 +106,7 @@ public class AgentManufacturer extends ResourceAgent {
 
     private void startWorking() {
 
+        isWorking = true;
         SequentialBehaviour seqBehaviour = new SequentialBehaviour(this) {
             public int onEnd() {
                 isDone = true;
@@ -122,8 +123,9 @@ public class AgentManufacturer extends ResourceAgent {
                 @Override
                 protected void onWake() {
                     System.out.println("[" + getLocalName() +
+                            "] принял положение: " + operation.getRequiresSetup().getName() + ", инструмент: " + operation.getRequiresSetup().getRequiresTool().getName());
+                    System.out.println("[" + getLocalName() +
                             "] выполняется " + operation.getName() + " " + operation.getPerformedOverMaterial().getName());
-                    //createJournal();
                 }
 
                /* private void createJournal() {

@@ -24,25 +24,11 @@ public class QueryExecutor implements QueryExecutorService {
         return queryExecutor;
     }
 
-
-    /*@Override
-    public <T extends AbstractItem> T seekEntity(String entity, String entityName, Class<T extends AbstractItem> type) throws SQLException {
-        connection = DriverManager.getConnection(ConnectConstants.DB_URL, ConnectConstants.USER, ConnectConstants.PASSWORD);
-        PreparedStatement getEntity = connection.prepareStatement("SELECT * FROM product");
-        //getEntity.setString(1, entity);
-        //getEntity.setString(2, entityName);
-        ResultSet resultSet = getEntity.executeQuery();
-
-        connection.close();
-
-    }*/
-
     @Override
     public List<Resource> seekAgents() throws SQLException {
         connection = DriverManager.getConnection(ConnectConstants.DB_URL, ConnectConstants.USER, ConnectConstants.PASSWORD);
         PreparedStatement getAgents = connection.prepareStatement("SELECT r.name as rname, s.name as sname, r.description, r.type from resource r JOIN station s ON r.station_id = s.id");
         ResultSet resultSet = getAgents.executeQuery();
-        System.out.println(resultSet);
         List<Resource> resources = new ArrayList<>();
         while (resultSet.next()) {
             Resource agent = new DefaultResource();
@@ -62,36 +48,61 @@ public class QueryExecutor implements QueryExecutorService {
         return resources;
     }
 
-    @Override
-    public Map<Station, Operation> seekPlan(String planName) throws SQLException {
+  /*  @Override
+    public int seekPlanId() throws SQLException {
         connection = DriverManager.getConnection(ConnectConstants.DB_URL, ConnectConstants.USER, ConnectConstants.PASSWORD);
-        PreparedStatement getStations = connection
+        PreparedStatement getAgents = connection.prepareStatement("SELECT r.name as rname, s.name as sname, r.description, r.type from resource r JOIN station s ON r.station_id = s.id");
+
+
+        return 0;
+    }*/
+
+    @Override
+    public Plan seekPlan(String productName) throws SQLException {
+        Plan plan = new DefaultPlan();
+        connection = DriverManager.getConnection(ConnectConstants.DB_URL, ConnectConstants.USER, ConnectConstants.PASSWORD);
+        PreparedStatement getPlanId = connection
+                .prepareStatement("select plan_id from product where name = ?");
+        getPlanId.setString(1, productName);
+        ResultSet resultSet = getPlanId.executeQuery();
+        while (resultSet.next()) {
+            plan.setId(resultSet.getInt("plan_id"));
+        }
+        PreparedStatement getOperations = connection
                 .prepareStatement("select s.name as s_name, o.name as o_name, o.duration as duration, s2.name as s2_name, m.name as m_name, tool.name as t_name \n" +
                         "from plan_station_operation \n" +
                         "join station s on s.id = plan_station_operation.station_id\n" +
                         "join operation o on o.id = plan_station_operation.operation_id\n" +
                         "join setup s2 on s2.id = o.setup_id\n" +
                         "join tool on s2.tool_id = tool.id\n" +
-                        "join material m on m.id = o.material_id");
-        ResultSet resultSet = getStations.executeQuery();
-        Map<Station, Operation> stationOperationMap = new LinkedHashMap<>();
+                        "join material m on m.id = o.material_id\n" +
+                        "where plan_id = ?");
+        getOperations.setInt(1, plan.getId());
+        resultSet = getOperations.executeQuery();
         while (resultSet.next()) {
             Tool tool = new DefaultTool();
             tool.setName(resultSet.getString("t_name"));
+
             Material material = new DefaultMaterial();
             material.setName(resultSet.getString("m_name"));
+
             Setup setup = new DefaultSetup();
             setup.setName(resultSet.getString("s2_name"));
+            setup.setRequiresTool(tool);
+
+            Station station = new DefaultStation();
+            station.setName(resultSet.getString("s_name"));
+
+
             Operation operation = new DefaultOperation();
             operation.setName(resultSet.getString("o_name"));
             operation.setRequiresSetup(setup);
             operation.setPerformedOverMaterial(material);
-           // operation.setDuration(resultSet.getString("duration"));
-            Station station = new DefaultStation();
-            station.setName(resultSet.getString("s_name"));
-            stationOperationMap.put(station, operation);
+            operation.setDuration(resultSet.getInt("duration"));
+            operation.setPerfomedOnStation(station);
+            plan.addHasOperations(operation);
         }
         connection.close();
-        return stationOperationMap;
+        return plan;
     }
 }

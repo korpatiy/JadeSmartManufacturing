@@ -37,5 +37,4 @@ public class DefaultSendOrder implements SendOrder {
    public Order getOrder() {
      return this.order;
    }
-
 }

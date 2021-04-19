@@ -11,6 +11,7 @@ import org.manufacture.Ontology.concepts.general.Resource;
 import org.manufacture.dbConnection.QueryExecutor;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.List;
 
 public class Main {
@@ -19,17 +20,17 @@ public class Main {
 
     //в класс
     public static void startMainContainer() throws StaleProxyException {
-        Profile myProfile = new ProfileImpl();
-        AgentContainer mainContainer = runtime.createMainContainer(myProfile);
+        Profile mainProfile = new ProfileImpl();
+        AgentContainer mainContainer = runtime.createMainContainer(mainProfile);
         AgentController rma = mainContainer.createNewAgent("rma", "jade.tools.rma.rma", null);
         rma.start();
     }
 
     //в класс
     public static void startManufactureContainer() throws SQLException, StaleProxyException {
-        Profile anotherProfile = new ProfileImpl(false);
-        anotherProfile.setParameter(Profile.CONTAINER_NAME, "Manufacture-Container");
-        AgentContainer manufactureContainer = runtime.createAgentContainer(anotherProfile);
+        Profile manufactureProfile = new ProfileImpl(false);
+        manufactureProfile.setParameter(Profile.CONTAINER_NAME, "Manufacture-Container");
+        AgentContainer manufactureContainer = runtime.createAgentContainer(manufactureProfile);
 
         QueryExecutorService queryExecutor = QueryExecutor.getQueryExecutor();
 
@@ -47,7 +48,8 @@ public class Main {
             }
         });
 
-        Object[] args = new Object[]{"Машина стиральная стандартная", "Стандартный", "today"};
+        Date date = new Date();
+        Object[] args = new Object[]{"Машина стиральная стандартная", date, 1};
         AgentController agentDistributor = manufactureContainer.createNewAgent("DistributorAgent",
                 "org.manufacture.Agents.AgentDistributor", args);
         agentDistributor.start();

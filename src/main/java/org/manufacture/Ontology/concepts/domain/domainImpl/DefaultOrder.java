@@ -81,34 +81,4 @@ public class DefaultOrder implements Order {
     public Plan getExecutedByPlan() {
         return this.executedByPlan;
     }
-
-    /**
-     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasOperations
-     */
-    private List hasOperations = new ArrayList();
-
-    public void addHasOperations(Operation elem) {
-        hasOperations.add(elem);
-    }
-
-    public boolean removeHasOperations(Operation elem) {
-        boolean result = hasOperations.remove(elem);
-        return result;
-    }
-
-    public void clearAllHasOperations() {
-        hasOperations.clear();
-    }
-
-    public Iterator getAllHasOperations() {
-        return hasOperations.iterator();
-    }
-
-    public List getHasOperations() {
-        return hasOperations;
-    }
-
-    public void setHasOperations(List l) {
-        hasOperations = l;
-    }
 }

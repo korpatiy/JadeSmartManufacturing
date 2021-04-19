@@ -35,14 +35,4 @@ public interface Order extends jade.content.Concept {
    public void setExecutedByPlan(Plan value);
    public Plan getExecutedByPlan();
 
-   /**
-    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasOperations
-    */
-   public void addHasOperations(Operation elem);
-   public boolean removeHasOperations(Operation elem);
-   public void clearAllHasOperations();
-   public Iterator getAllHasOperations();
-   public List getHasOperations();
-   public void setHasOperations(List l);
-
 }

@@ -51,7 +51,7 @@ public class ManufactureOntology extends Ontology {
     public static final String ITEM = "Item";
     public static final String ORDER_EXECUTEDBYPLAN = "executedByPlan";
     public static final String ORDER_DUEDATE = "dueDate";
-    public static final String ORDER_HASOPERATIONS="hasOperations";
+    public static final String PLAN_HASOPERATIONS ="hasOperations";
     public static final String ORDER_FORMEDONPRODUCT = "formedOnProduct";
     public static final String ORDER_QUANTITY = "quantity";
     public static final String ORDER = "Order";
@@ -160,7 +160,7 @@ public class ManufactureOntology extends Ontology {
             operationSchema.add(OPERATION_DURATION, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_PERFORMEDOVERMATERIAL, materialSchema, ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_REQUIRESSETUP, setupSchema, ObjectSchema.OPTIONAL);
-            productSchema.add(PRODUCT_HASMATERIALS, materialSchema, 1, ObjectSchema.UNLIMITED);
+            productSchema.add(PRODUCT_HASMATERIALS, materialSchema, 0, ObjectSchema.UNLIMITED);
             manufactureJournalSchema.add(MANUFACTUREJOURNAL_HASOPERATIONJOURNALS, operationJournalSchema, 0, ObjectSchema.UNLIMITED);
             failureSchema.add(FAILURE_NAME, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             failureSchema.add(FAILURE_OCCURRENCEDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
@@ -171,7 +171,6 @@ public class ManufactureOntology extends Ontology {
             setupSchema.add(SETUP_REQUIRESTOOL, toolSchema, ObjectSchema.OPTIONAL);
             setupSchema.add(SETUP_ID, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_QUANTITY, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
-            orderSchema.add(ORDER_HASOPERATIONS, operationSchema, 0, ObjectSchema.UNLIMITED);
             orderSchema.add(ORDER_FORMEDONPRODUCT, productSchema, ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_DUEDATE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             orderSchema.add(ORDER_EXECUTEDBYPLAN, planSchema, ObjectSchema.OPTIONAL);
@@ -183,6 +182,7 @@ public class ManufactureOntology extends Ontology {
             resourceSchema.add(RESOURCE_NAME, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             resourceSchema.add(RESOURCE_TYPE, (TermSchema) getSchema(BasicOntology.STRING), ObjectSchema.OPTIONAL);
             planSchema.add(PLAN_ID, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
+            planSchema.add(PLAN_HASOPERATIONS, operationSchema, 0, ObjectSchema.UNLIMITED);
             sendOrderSchema.add(SENDORDER_ORDER, orderSchema, ObjectSchema.OPTIONAL);
             sendReportSchema.add(SENDREPORT_HASMANUFACTUREJOURNALS, manufactureJournalSchema, 0, ObjectSchema.UNLIMITED);
             sendOperationJournalsSchema.add(SENDOPERATIONJOURNALS_OPERATIONJOURNALS, operationJournalSchema, 0, ObjectSchema.UNLIMITED);
