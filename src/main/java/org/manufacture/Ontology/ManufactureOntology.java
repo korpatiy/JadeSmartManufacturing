@@ -75,7 +75,7 @@ public class ManufactureOntology extends Ontology {
     public static final String OPERATION_PERFORMEDOVERMATERIAL = "performedOverMaterial";
     public static final String OPERATION_DURATION = "duration";
     public static final String OPERATION_HASFUNCTION = "hasFunction";
-    public static final String OPERATION_PERFOMEDONSTATION = "perfomedOnStation";
+    public static final String OPERATION_PERFORMEDONSTATION = "performedOnStation";
     public static final String OPERATION = "Operation";
     public static final String OPERATIONJOURNAL_HASFAILURES = "hasFailures";
     public static final String OPERATIONJOURNAL_DESCRIBESOPERATION = "describesOperation";
@@ -155,7 +155,7 @@ public class ManufactureOntology extends Ontology {
             operationJournalSchema.add(OPERATIONJOURNAL_HASRESOURCE, resourceSchema, ObjectSchema.OPTIONAL);
             operationJournalSchema.add(OPERATIONJOURNAL_DESCRIBESOPERATION, operationSchema, ObjectSchema.OPTIONAL);
             operationJournalSchema.add(OPERATIONJOURNAL_HASFAILURES, failureSchema, 0, ObjectSchema.UNLIMITED);
-            operationSchema.add(OPERATION_PERFOMEDONSTATION, stationSchema, ObjectSchema.OPTIONAL);
+            operationSchema.add(OPERATION_PERFORMEDONSTATION, stationSchema, ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_HASFUNCTION, functionSchema, ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_DURATION, (TermSchema) getSchema(BasicOntology.INTEGER), ObjectSchema.OPTIONAL);
             operationSchema.add(OPERATION_PERFORMEDOVERMATERIAL, materialSchema, ObjectSchema.OPTIONAL);

@@ -24,24 +24,6 @@ public abstract class ResourceAgent extends Agent {
     private String type;
     private final DFAgentDescription dfd = new DFAgentDescription();
     private final ServiceDescription sd = new ServiceDescription();
-    /*private boolean isWorking = false;
-    private boolean isDone = false;
-
-    public boolean isWorking() {
-        return isWorking;
-    }
-
-    public void setWorking(boolean working) {
-        isWorking = working;
-    }
-
-    public boolean isDone() {
-        return isDone;
-    }
-
-    public void setDone(boolean done) {
-        isDone = done;
-    }*/
 
     public Codec getCodec() {
         return codec;
@@ -125,25 +107,4 @@ public abstract class ResourceAgent extends Agent {
             }
         }
     }
-
-  /*  private class SendInform extends CyclicBehaviour {
-
-        private ACLMessage reply;
-
-        public SendInform(ACLMessage reply) {
-            this.reply = reply;
-        }
-
-        @Override
-        public void action() {
-            if (isDone) {
-                reply.setPerformative(ACLMessage.INFORM);
-                // отчет
-
-                send(reply);
-                isWorking = false;
-                isDone = false;
-            }
-        }
-    }*/
 }

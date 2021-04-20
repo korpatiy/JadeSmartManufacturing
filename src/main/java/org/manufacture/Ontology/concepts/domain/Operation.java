@@ -13,8 +13,8 @@ public interface Operation extends Item {
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#perfomedOnStation
    */
-   public void setPerfomedOnStation(Station value);
-   public Station getPerfomedOnStation();
+   public void setPerformedOnStation(Station value);
+   public Station getPerformedOnStation();
 
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#hasFunction

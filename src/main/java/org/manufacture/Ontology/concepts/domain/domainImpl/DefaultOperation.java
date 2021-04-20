@@ -41,10 +41,10 @@ public class DefaultOperation implements Operation {
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#perfomedOnStation
    */
    private Station perfomedOnStation;
-   public void setPerfomedOnStation(Station value) { 
+   public void setPerformedOnStation(Station value) {
     this.perfomedOnStation=value;
    }
-   public Station getPerfomedOnStation() {
+   public Station getPerformedOnStation() {
      return this.perfomedOnStation;
    }
 

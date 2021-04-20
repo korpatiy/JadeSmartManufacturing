@@ -15,6 +15,7 @@ import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import org.manufacture.Ontology.actions.SendOperationJournals;
 import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.SendTasks;
 import org.manufacture.Ontology.actions.actionsImpl.DefaultSendTasks;
@@ -34,6 +35,7 @@ public class ProductManager extends ResourceAgent {
     private boolean isWorking = false;
     private String productName;
     private Plan plan;
+    private boolean isDone = false;
 
     @Override
     protected void setup() {
@@ -84,12 +86,7 @@ public class ProductManager extends ResourceAgent {
                         "] Принял ACCEPT сообщение от дистрб");
                 processContent(msg);
                 manageProduct();
-
-                //переместить в cycle
-                /*ACLMessage reply = msg.createReply();
-                reply.setPerformative(ACLMessage.INFORM);
-                send(reply);*/
-                //doDelete();
+                addBehaviour(new SendInform(msg.createReply()));
             } else {
                 block();
             }
@@ -110,6 +107,26 @@ public class ProductManager extends ResourceAgent {
                     plan = order.getExecutedByPlan();
                     productName = order.getFormedOnProduct().getName();
                 }
+            }
+        }
+    }
+
+    private class SendInform extends CyclicBehaviour {
+
+        private ACLMessage reply;
+
+        public SendInform(ACLMessage reply) {
+            this.reply = reply;
+        }
+
+        @Override
+        public void action() {
+            if (isDone) {
+                reply.setPerformative(ACLMessage.INFORM);
+
+                send(reply);
+                isWorking = false;
+                isDone = false;
             }
         }
     }
@@ -174,7 +191,8 @@ public class ProductManager extends ResourceAgent {
                                     "] ожидаю результатов от " + firstReply.getSender().getLocalName());
                             step = 2;
                         } else {
-                            System.out.println("отказ");
+                            System.out.println("[" + getLocalName() +
+                                    "] октаз от" + firstReply.getSender().getLocalName());
                             isAccept = true;
                             step = 3;
                         }
@@ -184,10 +202,11 @@ public class ProductManager extends ResourceAgent {
                 case 2:
                     ACLMessage secondReply = myAgent.receive(mt);
                     if (secondReply != null) {
-                        if (secondReply.getPerformative() == ACLMessage.INFORM)
+                        if (secondReply.getPerformative() == ACLMessage.INFORM) {
                             System.out.println("[" + getLocalName() +
                                     "] принял успешный результат от " + secondReply.getSender().getLocalName());
-                        else {
+                            processContent(secondReply);
+                        } else {
                             System.out.println("[" + getLocalName() +
                                     "] принял отрицательный результат от " + secondReply.getSender().getLocalName());
                         }
@@ -195,6 +214,25 @@ public class ProductManager extends ResourceAgent {
                     } else {
                         block();
                     }
+            }
+        }
+
+        private void processContent(ACLMessage msg) {
+            ContentElement content = null;
+            try {
+                content = getContentManager().extractContent(msg);
+            } catch (Codec.CodecException | OntologyException e) {
+                e.printStackTrace();
+            }
+            if (content != null) {
+                Concept action = ((Action) content).getAction();
+                if (action instanceof SendOperationJournals) {
+                    SendOperationJournals operationJournals = (SendOperationJournals) action;
+                    int x =5;
+                    //Order order = sendOrder.getOrder();
+                   // plan = order.getExecutedByPlan();
+                    //productName = order.getFormedOnProduct().getName();
+                }
             }
         }
 
@@ -216,6 +254,7 @@ public class ProductManager extends ResourceAgent {
         FSMBehaviour fsmB = new FSMBehaviour(this) {
             @Override
             public int onEnd() {
+                isDone = true;
                 System.out.println("[" + getLocalName() +
                         "] Закончил работу над продуктом:" + productName);
                 return 0;
@@ -253,21 +292,13 @@ public class ProductManager extends ResourceAgent {
         fsmB.registerState(new SendRequest(VOperations, Constants.VERIFIER_TYPE), "E");
 
         List<Operation> POperations = getOperations("Комлпектовка");
-        fsmB.registerState(new SendRequest(POperations, Constants.PRODUCT_PACKER_TYPE), "F");
-
-        fsmB.registerLastState(new OneShotBehaviour() {
-            @Override
-            public void action() {
-                System.out.println("кц");
-            }
-        }, "G");
+        fsmB.registerLastState(new SendRequest(POperations, Constants.PRODUCT_PACKER_TYPE), "F");
 
         fsmB.registerTransition("A", "B", 1);
         fsmB.registerTransition("B", "C", 2);
         fsmB.registerTransition("C", "D", 2);
         fsmB.registerTransition("D", "E", 2);
         fsmB.registerTransition("E", "F", 2);
-        fsmB.registerTransition("F", "G", 2);
 
         addBehaviour(fsmB);
     }
@@ -277,7 +308,7 @@ public class ProductManager extends ResourceAgent {
 
         for (int i = 0; i < plan.getHasOperations().size(); i++) {
             Operation operation = (Operation) plan.getHasOperations().get(i);
-            if (operation.getPerfomedOnStation().getName().contains(s))
+            if (operation.getPerformedOnStation().getName().contains(s))
                 operations.add(operation);
         }
         return operations;

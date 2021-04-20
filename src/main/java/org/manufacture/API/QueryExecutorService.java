@@ -1,7 +1,7 @@
 package org.manufacture.API;
 
 import org.manufacture.Ontology.concepts.domain.Plan;
-import org.manufacture.Ontology.concepts.general.Resource;
+import org.manufacture.Ontology.concepts.domain.ProductionResource;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -10,7 +10,7 @@ public interface QueryExecutorService {
 
     Plan seekPlan(String productName) throws SQLException;
 
-    List<Resource> seekAgents() throws SQLException;
+    List<ProductionResource> seekAgents() throws SQLException;
 
     // int seekPlanId(String productName) throws SQLException;
 

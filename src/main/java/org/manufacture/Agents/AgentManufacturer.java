@@ -9,9 +9,16 @@ import jade.util.leap.List;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import org.manufacture.Ontology.actions.SendOperationJournals;
 import org.manufacture.Ontology.actions.SendTasks;
+import org.manufacture.Ontology.actions.actionsImpl.DefaultSendOperationJournals;
 import org.manufacture.Ontology.concepts.domain.Operation;
+import org.manufacture.Ontology.concepts.domain.OperationJournal;
 import org.manufacture.Ontology.concepts.domain.Tool;
+import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultOperationJournal;
+import org.manufacture.Ontology.concepts.general.Resource;
+import org.manufacture.Ontology.concepts.general.generalmpl.DefaultResource;
+import org.manufacture.constants.Constants;
 
 import java.util.Date;
 
@@ -22,6 +29,7 @@ public class AgentManufacturer extends ResourceAgent {
     private boolean isDone = false;
     private String station;
     private java.util.List<Tool> toolList;
+    private SendOperationJournals sendJournals;
 
     @Override
     protected void setup() {
@@ -95,8 +103,11 @@ public class AgentManufacturer extends ResourceAgent {
         public void action() {
             if (isDone) {
                 reply.setPerformative(ACLMessage.INFORM);
-                // отчет
-
+                try {
+                    getContentManager().fillContent(reply, new Action(getAID(), sendJournals));
+                } catch (Codec.CodecException | OntologyException codecException) {
+                    codecException.printStackTrace();
+                }
                 send(reply);
                 isWorking = false;
                 isDone = false;
@@ -106,6 +117,7 @@ public class AgentManufacturer extends ResourceAgent {
 
     private void startWorking() {
 
+        sendJournals = new DefaultSendOperationJournals();
         isWorking = true;
         SequentialBehaviour seqBehaviour = new SequentialBehaviour(this) {
             public int onEnd() {
@@ -118,35 +130,36 @@ public class AgentManufacturer extends ResourceAgent {
         for (int i = 0; i < operations.size(); i++) {
             Operation operation = (Operation) operations.get(i);
             //Положение Setup
-            Date startDateO = new Date();
-            seqBehaviour.addSubBehaviour(new WakerBehaviour(this, operation.getDuration()) {
+            Date startDate = new Date();
+            seqBehaviour.addSubBehaviour(new WakerBehaviour(this, operation.getDuration() - 1000) {
                 @Override
                 protected void onWake() {
                     System.out.println("[" + getLocalName() +
                             "] принял положение: " + operation.getRequiresSetup().getName() + ", инструмент: " + operation.getRequiresSetup().getRequiresTool().getName());
-                    System.out.println("[" + getLocalName() +
-                            "] выполняется " + operation.getName() + " " + operation.getPerformedOverMaterial().getName());
+
+                    String baseOp = "[" + getLocalName() +
+                            "] выполняется " + operation.getName() + " " + operation.getPerformedOverMaterial().getName();
+                    if (operation.getHasFunction() != null)
+                        baseOp += " " + operation.getHasFunction().getName() + " " + operation.getHasFunction().getPerformedOverMaterial().getName();
+                    System.out.println(baseOp);
+                    createJournal();
                 }
 
-               /* private void createJournal() {
-                    Date endDateO = new Date();
-                    Resource resource = new Resource();
-                    resource.setName(getName());
+                private void createJournal() {
+                    Date endDate = new Date();
+                    Resource resource = new DefaultResource();
+                    resource.setName(getLocalName());
                     resource.setType(getType());
-                    OperationJournal operationJournal = new OperationJournal();
-                    operationJournal.setOperation(operation);
+                    OperationJournal operationJournal = new DefaultOperationJournal();
+                    operationJournal.setDescribesOperation(operation);
                     operationJournal.setStatus(Constants.STATUS_DONE);
-                    operationJournal.setStartDate(startDateO);
-                    operationJournal.setEndDate(endDateO);
-                    operationJournal.setResource(resource);
-                    stationJournal.addOperationJournals(operationJournal);
-                    //need
-                    //operationJournal.setFailures();
-                }*/
+                    operationJournal.setStartDate(startDate);
+                    operationJournal.setEndDate(endDate);
+                    operationJournal.setHasResource(resource);
+                    sendJournals.addOperationJournals(operationJournal);
+                }
             });
         }
         addBehaviour(seqBehaviour);
     }
-
-
 }

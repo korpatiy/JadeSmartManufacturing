@@ -7,7 +7,7 @@ import jade.wrapper.AgentContainer;
 import jade.wrapper.AgentController;
 import jade.wrapper.StaleProxyException;
 import org.manufacture.API.QueryExecutorService;
-import org.manufacture.Ontology.concepts.general.Resource;
+import org.manufacture.Ontology.concepts.domain.ProductionResource;
 import org.manufacture.dbConnection.QueryExecutor;
 
 import java.sql.SQLException;
@@ -35,7 +35,7 @@ public class Main {
         QueryExecutorService queryExecutor = QueryExecutor.getQueryExecutor();
 
         //need interface resource
-        List<Resource> resources = queryExecutor.seekAgents();
+        List<ProductionResource> resources = queryExecutor.seekAgents();
 
         resources.forEach(resource -> {
             Object[] args = new Object[]{resource.getType()};

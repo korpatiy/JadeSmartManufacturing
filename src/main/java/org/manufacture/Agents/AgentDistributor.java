@@ -10,6 +10,7 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetInitiator;
+import jade.proto.ContractNetResponder;
 import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.actionsImpl.DefaultSendOrder;
@@ -45,13 +46,13 @@ public class AgentDistributor extends ResourceAgent {
             throwable.printStackTrace();
         }
         try {
-            managerAgents = findServices(Constants.PRODUCT_MANAGER_TYPE);
-        } catch (FIPAException e) {
+            Thread.sleep(20000);
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
         try {
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
+            managerAgents = findServices(Constants.PRODUCT_MANAGER_TYPE);
+        } catch (FIPAException e) {
             e.printStackTrace();
         }
         orderHandler();
