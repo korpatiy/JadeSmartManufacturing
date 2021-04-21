@@ -38,7 +38,7 @@ public class Main {
         List<ProductionResource> resources = queryExecutor.seekAgents();
 
         resources.forEach(resource -> {
-            Object[] args = new Object[]{resource.getType()};
+            Object[] args = new Object[]{resource.getId(), resource.getType()};
             String className = "org.manufacture.Agents.";
             if (resource.getName().contains("Manufacturer") || resource.getName().contains("Verifier") || resource.getName().contains("Packer")) {
                 createAgent(manufactureContainer, resource.getName(), args, className + "AgentManufacturer");

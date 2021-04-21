@@ -12,6 +12,11 @@ import jade.util.leap.List;
 public interface Order extends jade.content.Concept {
 
    /**
+    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#id
+    */
+   public void setId(int value);
+   public int getId();
+   /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#quantity
    */
    public void setQuantity(int value);

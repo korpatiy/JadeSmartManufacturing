@@ -24,6 +24,7 @@ public abstract class ResourceAgent extends Agent {
     private String type;
     private final DFAgentDescription dfd = new DFAgentDescription();
     private final ServiceDescription sd = new ServiceDescription();
+    private int id;
 
     public Codec getCodec() {
         return codec;
@@ -39,6 +40,14 @@ public abstract class ResourceAgent extends Agent {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     @Override
@@ -89,7 +98,8 @@ public abstract class ResourceAgent extends Agent {
     protected void setFields() {
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
-            this.type = (String) args[0];
+            this.id = (int) args[0];
+            this.type = (String) args[1];
         } else {
             System.out.println("No arguments");
             doDelete();

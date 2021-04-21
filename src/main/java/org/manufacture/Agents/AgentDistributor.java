@@ -4,13 +4,11 @@ import jade.content.lang.Codec;
 import jade.content.onto.OntologyException;
 import jade.content.onto.basic.Action;
 import jade.core.AID;
-import jade.core.Agent;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.ContractNetInitiator;
-import jade.proto.ContractNetResponder;
 import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.actionsImpl.DefaultSendOrder;
@@ -18,12 +16,12 @@ import org.manufacture.Ontology.concepts.domain.Order;
 import org.manufacture.Ontology.concepts.domain.Plan;
 import org.manufacture.Ontology.concepts.domain.Product;
 import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultOrder;
-import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultPlan;
 import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultProduct;
 import org.manufacture.constants.Constants;
 import org.manufacture.dbConnection.QueryExecutor;
 
 import java.sql.SQLException;
+import java.util.Date;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Vector;
@@ -61,18 +59,12 @@ public class AgentDistributor extends ResourceAgent {
     private void createOrder() throws SQLException {
         Object[] arguments = getArguments();
         String productName = (String) arguments[0];
-        String dueDate = String.valueOf(arguments[1]);
+        //String dueDate = String.valueOf(arguments[1]);
         int qty = (int) arguments[2];
-        order = new DefaultOrder();
         QueryExecutorService queryExecutor = QueryExecutor.getQueryExecutor();
-        Plan plan = queryExecutor.seekPlan(productName);
-
-        Product product = new DefaultProduct();
-        product.setName(productName);
-        order.setFormedOnProduct(product);
-        order.setQuantity(qty);
-        order.setDueDate(dueDate);
-        order.setExecutedByPlan(plan);
+        order = queryExecutor.processOrder(productName, (Date) arguments[1], qty);
+        //QueryExecutor x = QueryExecutor.getQueryExecutor();
+        //x.Test();
     }
 
     private void orderHandler() {

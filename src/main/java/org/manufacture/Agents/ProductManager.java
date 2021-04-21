@@ -15,27 +15,31 @@ import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.actions.SendOperationJournals;
 import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.SendTasks;
 import org.manufacture.Ontology.actions.actionsImpl.DefaultSendTasks;
-import org.manufacture.Ontology.concepts.domain.Operation;
-import org.manufacture.Ontology.concepts.domain.Order;
-import org.manufacture.Ontology.concepts.domain.Plan;
-import org.manufacture.Ontology.concepts.domain.Station;
+import org.manufacture.Ontology.concepts.domain.*;
+import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultManufactureJournal;
 import org.manufacture.constants.Constants;
+import org.manufacture.dbConnection.QueryExecutor;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 public class ProductManager extends ResourceAgent {
 
-    private Map<Station, Operation> stationOperationMap;
     private boolean isWorking = false;
     private String productName;
     private Plan plan;
+    private Order order;
     private boolean isDone = false;
+    private boolean isFailed = false;
+    private ManufactureJournal manufactureJournal = new DefaultManufactureJournal();
 
     @Override
     protected void setup() {
@@ -103,7 +107,7 @@ public class ProductManager extends ResourceAgent {
                 Concept action = ((Action) content).getAction();
                 if (action instanceof SendOrder) {
                     SendOrder sendOrder = (SendOrder) action;
-                    Order order = sendOrder.getOrder();
+                    order = sendOrder.getOrder();
                     plan = order.getExecutedByPlan();
                     productName = order.getFormedOnProduct().getName();
                 }
@@ -135,8 +139,9 @@ public class ProductManager extends ResourceAgent {
         int step = 0;
         private AID worker;
         MessageTemplate mt;
-        boolean isAccept = false;
+        boolean isFailed = false;
         private jade.util.leap.List operations;
+        //private jade.util.leap.List newOperations;
         private String manufacturerType;
         private int workerId = 0;
 
@@ -206,13 +211,14 @@ public class ProductManager extends ResourceAgent {
                 case 2:
                     ACLMessage secondReply = myAgent.receive(mt);
                     if (secondReply != null) {
+                        processContent(secondReply);
                         if (secondReply.getPerformative() == ACLMessage.INFORM) {
                             System.out.println("[" + getLocalName() +
                                     "] принял успешный результат от " + secondReply.getSender().getLocalName());
-                            processContent(secondReply);
-                        } else {
+                        } else if (secondReply.getPerformative() == ACLMessage.FAILURE) {
                             System.out.println("[" + getLocalName() +
                                     "] принял отрицательный результат от " + secondReply.getSender().getLocalName());
+                            isFailed = true;
                         }
                         step = 3;
                     } else {
@@ -231,11 +237,11 @@ public class ProductManager extends ResourceAgent {
             if (content != null) {
                 Concept action = ((Action) content).getAction();
                 if (action instanceof SendOperationJournals) {
-                    SendOperationJournals operationJournals = (SendOperationJournals) action;
-                    int x = 5;
-                    //Order order = sendOrder.getOrder();
-                    // plan = order.getExecutedByPlan();
-                    //productName = order.getFormedOnProduct().getName();
+                    SendOperationJournals sendOperationJournals = (SendOperationJournals) action;
+                    jade.util.leap.List operationJournals = sendOperationJournals.getOperationJournals();
+                    for (int i = 0; i < operationJournals.size(); i++) {
+                        manufactureJournal.addHasOperationJournals((OperationJournal) operationJournals.get(i));
+                    }
                 }
             }
         }
@@ -248,7 +254,7 @@ public class ProductManager extends ResourceAgent {
         // разбить на  варианта. Агент может отказаться
         @Override
         public int onEnd() {
-            return isAccept ? 4 : 2;
+            return isFailed ? 4 : 2;
         }
 
     }
@@ -261,17 +267,33 @@ public class ProductManager extends ResourceAgent {
                 isDone = true;
                 System.out.println("[" + getLocalName() +
                         "] Закончил работу над продуктом:" + productName);
+                Date eDate = new Date();
+                manufactureJournal.setEndDate(eDate);
+                manufactureJournal.setStatus(Constants.STATUS_DONE);
+                for (int i = 0; i < manufactureJournal.getHasOperationJournals().size(); i++) {
+                    OperationJournal oJ = (OperationJournal) manufactureJournal.getHasOperationJournals().get(i);
+                    if (oJ.getStatus().equals(Constants.STATUS_FAIL)) {
+                        manufactureJournal.setStatus(Constants.STATUS_FAIL);
+                        break;
+                    }
+                }
+                QueryExecutorService QES = QueryExecutor.getQueryExecutor();
+                try {
+                    QES.insertOJ(manufactureJournal, plan.getId(), order.getId());
+                } catch (SQLException throwable) {
+                    throwable.printStackTrace();
+                }
                 return 0;
             }
         };
 
-        //List<Operation> ManufactureOperations = new ArrayList<>();
-        //getOperations("Изготовление");
-        fsmB.registerFirstState(new OneShotBehaviour() {
+        fsmB.registerFirstState(new OneShotBehaviour(this) {
             @Override
             public void action() {
                 System.out.println("[" + getLocalName() +
-                        "] Начинаю производство продукта:" + productName);
+                        "] Начинаю производство продукта: " + productName);
+                Date date = new Date();
+                manufactureJournal.setStartDate(date);
             }
 
             @Override
@@ -280,6 +302,19 @@ public class ProductManager extends ResourceAgent {
             }
         }, "A");
 
+        fsmB.registerLastState(new OneShotBehaviour(this) {
+            @Override
+            public void action() {
+                System.out.println("[" + getLocalName() +
+                        "] Контроль не пройден");
+                isFailed = true;
+            }
+
+            @Override
+            public int onEnd() {
+                return 3;
+            }
+        }, "K");
         //List<String> uniqOperations = List.of("Предварительная сборка", "Общая сборка", "Конечная сборка", "Контроль", "Комлпектовка");
 
         //todo зафорить
@@ -303,6 +338,8 @@ public class ProductManager extends ResourceAgent {
         fsmB.registerTransition("C", "D", 2);
         fsmB.registerTransition("D", "E", 2);
         fsmB.registerTransition("E", "F", 2);
+
+        fsmB.registerTransition("B", "K", 4);
 
         addBehaviour(fsmB);
     }

@@ -14,8 +14,10 @@ import org.manufacture.Ontology.actions.SendTasks;
 import org.manufacture.Ontology.actions.actionsImpl.DefaultSendOperationJournals;
 import org.manufacture.Ontology.concepts.domain.Operation;
 import org.manufacture.Ontology.concepts.domain.OperationJournal;
+import org.manufacture.Ontology.concepts.domain.ProductionResource;
 import org.manufacture.Ontology.concepts.domain.Tool;
 import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultOperationJournal;
+import org.manufacture.Ontology.concepts.domain.domainImpl.DefaultProductionResource;
 import org.manufacture.Ontology.concepts.general.Resource;
 import org.manufacture.Ontology.concepts.general.generalmpl.DefaultResource;
 import org.manufacture.constants.Constants;
@@ -30,6 +32,7 @@ public class AgentManufacturer extends ResourceAgent {
     private String station;
     private java.util.List<Tool> toolList;
     private SendOperationJournals sendJournals;
+    private boolean isFailed = false;
 
     @Override
     protected void setup() {
@@ -42,7 +45,8 @@ public class AgentManufacturer extends ResourceAgent {
     protected void setFields() {
         Object[] args = getArguments();
         if (args != null && args.length > 0) {
-            setType((String) args[0]);
+            setId((int) args[0]);
+            setType((String) args[1]);
             //this.station = (String) args[1];
         } else {
             System.out.println("No arguments");
@@ -66,6 +70,7 @@ public class AgentManufacturer extends ResourceAgent {
                     processContent(msg);
                     startWorking();
                     addBehaviour(new SendInform(msg.createReply()));
+                    addBehaviour(new SendFail(msg.createReply()));
                 } else {
                     reply.setPerformative(ACLMessage.REFUSE);
                     System.out.println("[" + getLocalName() +
@@ -94,7 +99,6 @@ public class AgentManufacturer extends ResourceAgent {
     }
 
     private class SendInform extends CyclicBehaviour {
-
         private ACLMessage reply;
 
         public SendInform(ACLMessage reply) {
@@ -117,6 +121,29 @@ public class AgentManufacturer extends ResourceAgent {
         }
     }
 
+    private class SendFail extends CyclicBehaviour {
+        private ACLMessage reply;
+
+        public SendFail(ACLMessage reply) {
+            this.reply = reply;
+        }
+
+        @Override
+        public void action() {
+            if (isFailed) {
+                reply.setPerformative(ACLMessage.FAILURE);
+                try {
+                    getContentManager().fillContent(reply, new Action(getAID(), sendJournals));
+                } catch (Codec.CodecException | OntologyException codecException) {
+                    codecException.printStackTrace();
+                }
+                send(reply);
+                isWorking = false;
+                isFailed = false;
+            }
+        }
+    }
+
     private void startWorking() {
 
         sendJournals = new DefaultSendOperationJournals();
@@ -133,7 +160,7 @@ public class AgentManufacturer extends ResourceAgent {
             Operation operation = (Operation) operations.get(i);
             //Положение Setup
             Date startDate = new Date();
-            seqBehaviour.addSubBehaviour(new WakerBehaviour(this, operation.getDuration() - 1000) {
+            seqBehaviour.addSubBehaviour(new WakerBehaviour(this, operation.getDuration() - 2000) {
                 @Override
                 protected void onWake() {
                     System.out.println("[" + getLocalName() +
@@ -144,17 +171,26 @@ public class AgentManufacturer extends ResourceAgent {
                     if (operation.getHasFunction() != null)
                         baseOp += " " + operation.getHasFunction().getName() + " " + operation.getHasFunction().getPerformedOverMaterial().getName();
                     System.out.println(baseOp);
-                    createJournal();
+                    //if (operation.ge)
+                   /* if (operation.getName().equals("Установка")) {
+                        createJournal("fail");
+                        isFailed = true;
+                        seqBehaviour.reset();
+                        seqBehaviour.block();
+                    }*/
+                    createJournal(Constants.STATUS_DONE);
                 }
 
-                private void createJournal() {
+                private void createJournal(String fail) {
                     Date endDate = new Date();
-                    Resource resource = new DefaultResource();
+                    ProductionResource resource = new DefaultProductionResource();
                     resource.setName(getLocalName());
                     resource.setType(getType());
+                    int x = getId();
+                    resource.setId(getId());
                     OperationJournal operationJournal = new DefaultOperationJournal();
                     operationJournal.setDescribesOperation(operation);
-                    operationJournal.setStatus(Constants.STATUS_DONE);
+                    operationJournal.setStatus(fail);
                     operationJournal.setStartDate(startDate);
                     operationJournal.setEndDate(endDate);
                     operationJournal.setHasResource(resource);

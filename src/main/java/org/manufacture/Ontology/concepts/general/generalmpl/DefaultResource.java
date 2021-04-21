@@ -26,6 +26,16 @@ public class DefaultResource implements Resource {
     return _internalInstanceName;
   }
 
+    /**
+     * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#id
+     */
+    private int id;
+    public void setId(int value) {
+        this.id=value;
+    }
+    public int getId() {
+        return this.id;
+    }
    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#name
    */
