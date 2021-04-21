@@ -45,11 +45,11 @@ public class AgentDistributor extends ResourceAgent {
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }
-        try {
+        /*try {
             Thread.sleep(20000);
         } catch (InterruptedException e) {
             e.printStackTrace();
-        }
+        }*/
         try {
             managerAgents = findServices(Constants.PRODUCT_MANAGER_TYPE);
         } catch (FIPAException e) {

@@ -138,6 +138,7 @@ public class ProductManager extends ResourceAgent {
         boolean isAccept = false;
         private jade.util.leap.List operations;
         private String manufacturerType;
+        private int workerId = 0;
 
         public SendRequest(List<Operation> operations, String manufacturerType) {
             this.operations = castToJadeList(operations);
@@ -156,7 +157,7 @@ public class ProductManager extends ResourceAgent {
             switch (step) {
                 case 0:
                     try {
-                        worker = findServices(manufacturerType).get(0);
+                        worker = findServices(manufacturerType).get(workerId);
                     } catch (FIPAException e) {
                         e.printStackTrace();
                     }
@@ -192,9 +193,12 @@ public class ProductManager extends ResourceAgent {
                             step = 2;
                         } else {
                             System.out.println("[" + getLocalName() +
-                                    "] октаз от" + firstReply.getSender().getLocalName());
-                            isAccept = true;
-                            step = 3;
+                                    "] октаз от " + firstReply.getSender().getLocalName());
+                            step = 0;
+                            workerId++;
+                            System.out.println("[" + getLocalName() +
+                                    "] поиск другого исполнителя");
+                            this.restart();
                         }
                     } else {
                         block();
@@ -228,9 +232,9 @@ public class ProductManager extends ResourceAgent {
                 Concept action = ((Action) content).getAction();
                 if (action instanceof SendOperationJournals) {
                     SendOperationJournals operationJournals = (SendOperationJournals) action;
-                    int x =5;
+                    int x = 5;
                     //Order order = sendOrder.getOrder();
-                   // plan = order.getExecutedByPlan();
+                    // plan = order.getExecutedByPlan();
                     //productName = order.getFormedOnProduct().getName();
                 }
             }

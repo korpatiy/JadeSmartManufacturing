@@ -34,6 +34,8 @@ public class AgentManufacturer extends ResourceAgent {
     @Override
     protected void setup() {
         super.setup();
+        if (getLocalName().equals("PAProductManufacturer"))
+            isWorking = true;
         addBehaviour(new GetOfferRequest());
     }
 
