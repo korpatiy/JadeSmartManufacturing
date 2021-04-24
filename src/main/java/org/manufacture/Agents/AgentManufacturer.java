@@ -33,6 +33,7 @@ public class AgentManufacturer extends ResourceAgent {
     private java.util.List<Tool> toolList;
     private SendOperationJournals sendJournals;
     private boolean isFailed = false;
+    int cycle = 0;
 
     @Override
     protected void setup() {
@@ -107,7 +108,7 @@ public class AgentManufacturer extends ResourceAgent {
 
         @Override
         public void action() {
-            if (isDone) {
+            if (isDone && !isFailed) {
                 reply.setPerformative(ACLMessage.INFORM);
                 try {
                     getContentManager().fillContent(reply, new Action(getAID(), sendJournals));
@@ -130,7 +131,7 @@ public class AgentManufacturer extends ResourceAgent {
 
         @Override
         public void action() {
-            if (isFailed) {
+            if (isFailed && isDone) {
                 reply.setPerformative(ACLMessage.FAILURE);
                 try {
                     getContentManager().fillContent(reply, new Action(getAID(), sendJournals));
@@ -140,6 +141,7 @@ public class AgentManufacturer extends ResourceAgent {
                 send(reply);
                 isWorking = false;
                 isFailed = false;
+                isDone = false;
             }
         }
     }
@@ -161,6 +163,7 @@ public class AgentManufacturer extends ResourceAgent {
             //Положение Setup
             Date startDate = new Date();
             seqBehaviour.addSubBehaviour(new WakerBehaviour(this, operation.getDuration() - 2000) {
+
                 @Override
                 protected void onWake() {
                     System.out.println("[" + getLocalName() +
@@ -170,15 +173,22 @@ public class AgentManufacturer extends ResourceAgent {
                             "] выполняется " + operation.getName() + " " + operation.getPerformedOverMaterial().getName();
                     if (operation.getHasFunction() != null)
                         baseOp += " " + operation.getHasFunction().getName() + " " + operation.getHasFunction().getPerformedOverMaterial().getName();
+                    if (cycle == 0) {
+                        if (operation.getName().equals("Установка") && operation.getPerformedOverMaterial().getName().equals("Барабан")) {
+                            isFailed = true;
+                            //baseOp += " ОШИБКА";
+                            //createJournal(Constants.STATUS_FAIL);
+                            cycle++;
+                        }
+                    }
+                    if (isFailed) {
+                        baseOp += " ОШИБКА";
+                        createJournal(Constants.STATUS_FAIL);
+                    } else
+                        createJournal(Constants.STATUS_DONE);
+                    //createJournal(Constants.STATUS_DONE);
+
                     System.out.println(baseOp);
-                    //if (operation.ge)
-                   /* if (operation.getName().equals("Установка")) {
-                        createJournal("fail");
-                        isFailed = true;
-                        seqBehaviour.reset();
-                        seqBehaviour.block();
-                    }*/
-                    createJournal(Constants.STATUS_DONE);
                 }
 
                 private void createJournal(String fail) {
@@ -186,7 +196,6 @@ public class AgentManufacturer extends ResourceAgent {
                     ProductionResource resource = new DefaultProductionResource();
                     resource.setName(getLocalName());
                     resource.setType(getType());
-                    int x = getId();
                     resource.setId(getId());
                     OperationJournal operationJournal = new DefaultOperationJournal();
                     operationJournal.setDescribesOperation(operation);

@@ -22,10 +22,14 @@ public class DefaultMaterial implements Material {
     this._internalInstanceName = instance_name;
   }
 
-  public String toString() {
-    return _internalInstanceName;
-  }
-
+    @Override
+    public String toString() {
+        return "DefaultMaterial{" +
+                ", id=" + id +
+                ", description='" + description + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#id

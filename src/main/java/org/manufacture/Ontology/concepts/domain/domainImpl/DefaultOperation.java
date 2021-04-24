@@ -22,9 +22,19 @@ public class DefaultOperation implements Operation {
     this._internalInstanceName = instance_name;
   }
 
-  public String toString() {
-    return _internalInstanceName;
-  }
+    @Override
+    public String toString() {
+        return "DefaultOperation{" +
+                ", id=" + id +
+                ", description='" + description + '\'' +
+                ", perfomedOnStation=" + perfomedOnStation +
+                ", name='" + name + '\'' +
+                ", hasFunction=" + hasFunction +
+                ", duration=" + duration +
+                ", performedOverMaterial=" + performedOverMaterial +
+                ", requiresSetup=" + requiresSetup +
+                '}';
+    }
 
     /**
      * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#id

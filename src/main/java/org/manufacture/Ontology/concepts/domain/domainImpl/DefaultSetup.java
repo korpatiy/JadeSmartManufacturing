@@ -23,11 +23,16 @@ public class DefaultSetup implements Setup {
     this._internalInstanceName = instance_name;
   }
 
-  public String toString() {
-    return _internalInstanceName;
-  }
+    @Override
+    public String toString() {
+        return "DefaultSetup{" +
+                "name='" + name + '\'' +
+                ", requiresTool=" + requiresTool +
+                ", id=" + id +
+                '}';
+    }
 
-   /**
+    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#name
    */
    private String name;

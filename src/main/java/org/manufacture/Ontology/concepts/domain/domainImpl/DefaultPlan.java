@@ -26,11 +26,15 @@ public class DefaultPlan implements Plan {
     this._internalInstanceName = instance_name;
   }
 
-  public String toString() {
-    return _internalInstanceName;
-  }
+    @Override
+    public String toString() {
+        return "DefaultPlan{" +
+                ", id=" + id +
+                ", hasOperations=" + hasOperations +
+                '}';
+    }
 
-   /**
+    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#id
    */
    private int id;

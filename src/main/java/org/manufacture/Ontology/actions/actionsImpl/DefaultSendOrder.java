@@ -23,11 +23,14 @@ public class DefaultSendOrder implements SendOrder {
     this._internalInstanceName = instance_name;
   }
 
-  public String toString() {
-    return _internalInstanceName;
-  }
+    @Override
+    public String toString() {
+        return "DefaultSendOrder{" +
+                ", order=" + order +
+                '}';
+    }
 
-   /**
+    /**
    * Protege name: http://www.semanticweb.org/slava/ontologies/2021/1/ManufactureOntology#order
    */
    private Order order;

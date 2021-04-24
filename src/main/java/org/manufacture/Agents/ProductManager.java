@@ -29,7 +29,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 public class ProductManager extends ResourceAgent {
 
@@ -39,11 +38,14 @@ public class ProductManager extends ResourceAgent {
     private Order order;
     private boolean isDone = false;
     private boolean isFailed = false;
-    private ManufactureJournal manufactureJournal = new DefaultManufactureJournal();
+    private int qty = 0;
+    private ManufactureJournal manufactureJournal;
 
     @Override
     protected void setup() {
         super.setup();
+        if (getLocalName().equals("ProductManager2"))
+            isWorking = true;
         addBehaviour(new GetOfferRequests());
         addBehaviour(new ApplyOffer());
     }
@@ -76,7 +78,6 @@ public class ProductManager extends ResourceAgent {
             }
         }
     }
-
 
     private class ApplyOffer extends CyclicBehaviour {
 
@@ -172,7 +173,7 @@ public class ProductManager extends ResourceAgent {
                     ACLMessage request = new ACLMessage(ACLMessage.REQUEST);
                     request.addReceiver(worker);
                     request.setConversationId(Constants.MANAGER_MANUFACTURER);
-                    request.setReplyWith("request" + System.currentTimeMillis());
+                    request.setReplyWith("request" + worker.getLocalName());
                     request.setLanguage(getCodec().getName());
                     request.setOntology(getOntology().getName());
                     request.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
@@ -186,7 +187,7 @@ public class ProductManager extends ResourceAgent {
                     }
 
                     mt = MessageTemplate.and(MessageTemplate.MatchConversationId(Constants.MANAGER_MANUFACTURER),
-                            MessageTemplate.MatchInReplyTo(request.getReplyWith()));
+                            MessageTemplate.MatchReceiver(worker.getResolversArray()));
                     send(request);
                     step = 1;
                 case 1:
@@ -196,7 +197,7 @@ public class ProductManager extends ResourceAgent {
                             System.out.println("[" + getLocalName() +
                                     "] ожидаю результатов от " + firstReply.getSender().getLocalName());
                             step = 2;
-                        } else {
+                        } else if (firstReply.getPerformative() == ACLMessage.REFUSE) {
                             System.out.println("[" + getLocalName() +
                                     "] октаз от " + firstReply.getSender().getLocalName());
                             step = 0;
@@ -215,12 +216,26 @@ public class ProductManager extends ResourceAgent {
                         if (secondReply.getPerformative() == ACLMessage.INFORM) {
                             System.out.println("[" + getLocalName() +
                                     "] принял успешный результат от " + secondReply.getSender().getLocalName());
+                            step = 3;
                         } else if (secondReply.getPerformative() == ACLMessage.FAILURE) {
                             System.out.println("[" + getLocalName() +
                                     "] принял отрицательный результат от " + secondReply.getSender().getLocalName());
-                            isFailed = true;
+                            if (secondReply.getSender().getLocalName().contains("Verifier")) {
+                                isFailed = true;
+                                step = 3;
+                            } else {
+                                operations = new jade.util.leap.ArrayList();
+                                for (int i = 0; i < manufactureJournal.getHasOperationJournals().size(); i++) {
+                                    OperationJournal o = (OperationJournal) manufactureJournal.getHasOperationJournals().get(i);
+                                    if (o.getStatus().equals(Constants.STATUS_FAIL)) {
+                                        operations.add(o.getDescribesOperation());
+                                    }
+                                }
+                                step = 0;
+                                this.restart();
+                            }
                         }
-                        step = 3;
+                        // step = 3;
                     } else {
                         block();
                     }
@@ -264,7 +279,6 @@ public class ProductManager extends ResourceAgent {
         FSMBehaviour fsmB = new FSMBehaviour(this) {
             @Override
             public int onEnd() {
-                isDone = true;
                 System.out.println("[" + getLocalName() +
                         "] Закончил работу над продуктом:" + productName);
                 Date eDate = new Date();
@@ -277,11 +291,19 @@ public class ProductManager extends ResourceAgent {
                         break;
                     }
                 }
-                QueryExecutorService QES = QueryExecutor.getQueryExecutor();
+               /* QueryExecutorService QES = QueryExecutor.getQueryExecutor();
                 try {
                     QES.insertOJ(manufactureJournal, plan.getId(), order.getId());
                 } catch (SQLException throwable) {
                     throwable.printStackTrace();
+                }*/
+                if (qty == order.getQuantity()) {
+                    System.out.println("[" + getLocalName() +
+                            "] Закончил работу над заказом");
+                    isDone = true;
+                    return 0;
+                } else {
+                    manageProduct();
                 }
                 return 0;
             }
@@ -293,7 +315,9 @@ public class ProductManager extends ResourceAgent {
                 System.out.println("[" + getLocalName() +
                         "] Начинаю производство продукта: " + productName);
                 Date date = new Date();
+                manufactureJournal = new DefaultManufactureJournal();
                 manufactureJournal.setStartDate(date);
+                qty++;
             }
 
             @Override
@@ -308,6 +332,7 @@ public class ProductManager extends ResourceAgent {
                 System.out.println("[" + getLocalName() +
                         "] Контроль не пройден");
                 isFailed = true;
+                qty--;
             }
 
             @Override
@@ -317,7 +342,6 @@ public class ProductManager extends ResourceAgent {
         }, "K");
         //List<String> uniqOperations = List.of("Предварительная сборка", "Общая сборка", "Конечная сборка", "Контроль", "Комлпектовка");
 
-        //todo зафорить
         List<Operation> PAOperations = getOperations("Предварительная сборка");
         fsmB.registerState(new SendRequest(PAOperations, Constants.PA_PRODUCT_MANUFACTURER_TYPE), "B");
 

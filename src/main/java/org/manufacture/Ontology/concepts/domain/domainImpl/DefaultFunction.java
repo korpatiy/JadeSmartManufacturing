@@ -24,8 +24,13 @@ public class DefaultFunction implements Function {
         this._internalInstanceName = instance_name;
     }
 
+    @Override
     public String toString() {
-        return _internalInstanceName;
+        return "DefaultFunction{" +
+                ", name='" + name + '\'' +
+                ", performedOverMaterial=" + performedOverMaterial +
+                ", id=" + id +
+                '}';
     }
 
     /**

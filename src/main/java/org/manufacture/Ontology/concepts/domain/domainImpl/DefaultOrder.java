@@ -26,8 +26,15 @@ public class DefaultOrder implements Order {
         this._internalInstanceName = instance_name;
     }
 
+    @Override
     public String toString() {
-        return _internalInstanceName;
+        return "DefaultOrder{" +
+                ", id=" + id +
+                ", quantity=" + quantity +
+                ", formedOnProduct=" + formedOnProduct +
+                ", dueDate='" + dueDate + '\'' +
+                ", executedByPlan=" + executedByPlan +
+                '}';
     }
 
     /**

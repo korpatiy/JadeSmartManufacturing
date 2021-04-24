@@ -15,4 +15,5 @@ public interface SendOrder extends jade.content.AgentAction {
    */
    public void setOrder(Order value);
    public Order getOrder();
+
 }

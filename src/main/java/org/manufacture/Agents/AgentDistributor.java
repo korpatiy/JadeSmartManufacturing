@@ -12,6 +12,7 @@ import jade.proto.ContractNetInitiator;
 import org.manufacture.API.QueryExecutorService;
 import org.manufacture.Ontology.actions.SendOrder;
 import org.manufacture.Ontology.actions.actionsImpl.DefaultSendOrder;
+import org.manufacture.Ontology.concepts.domain.Operation;
 import org.manufacture.Ontology.concepts.domain.Order;
 import org.manufacture.Ontology.concepts.domain.Plan;
 import org.manufacture.Ontology.concepts.domain.Product;
@@ -43,11 +44,6 @@ public class AgentDistributor extends ResourceAgent {
         } catch (SQLException throwable) {
             throwable.printStackTrace();
         }
-        /*try {
-            Thread.sleep(20000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }*/
         try {
             managerAgents = findServices(Constants.PRODUCT_MANAGER_TYPE);
         } catch (FIPAException e) {

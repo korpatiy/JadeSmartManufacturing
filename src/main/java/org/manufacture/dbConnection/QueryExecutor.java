@@ -143,7 +143,7 @@ public class QueryExecutor implements QueryExecutorService {
         order.setQuantity(qty);
         order.setDueDate(String.valueOf(date));
         order.setExecutedByPlan(plan);
-        insertOrder(order, productName, date);
+        //insertOrder(order, productName, date);
         connection.close();
         return order;
     }

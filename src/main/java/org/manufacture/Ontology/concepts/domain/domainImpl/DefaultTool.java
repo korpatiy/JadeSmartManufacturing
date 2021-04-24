@@ -23,8 +23,13 @@ public class DefaultTool implements Tool {
         this._internalInstanceName = instance_name;
     }
 
+    @Override
     public String toString() {
-        return _internalInstanceName;
+        return "DefaultTool{" +
+                "id=" + id +
+                ", description='" + description + '\'' +
+                ", name='" + name + '\'' +
+                '}';
     }
 
     /**
